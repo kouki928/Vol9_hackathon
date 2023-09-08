@@ -1,14 +1,14 @@
-// import React, { useContext, useEffect, useState } from "react";
 import React, {useContext} from "react";
 import dayjs from "dayjs";
 import GlobalContext from "../../context/GlobalContext";
 
 export const Day = (props) => {
   const { day } = props;
-  const TrainingDays = [];
   // const [dayEvents, setDayEvents] = useState([]);
   const { setDaySelected, setShowEventModal, monthIndex, userTrainingData } =
     useContext(GlobalContext);
+
+  const todayStringElement = dayjs().format("YYYY/MM/DD").toString()
 
   // 今日の日付を色付けする
   const getCurrentDayClass = () => {
@@ -19,34 +19,53 @@ export const Day = (props) => {
 
   const NoticeElement = (day) => {
     const dayStringElement = dayjs(day).format("YYYY/MM/DD").toString();
-    const todayStringElement = dayjs().format("YYYY/MM/DD").toString()
     const todayUserData = userTrainingData[dayStringElement];
+    var i = 0;
 
     if (todayUserData === undefined && todayStringElement > dayStringElement){
       return (<p> / </p>)
     }
 
-    if (dayStringElement > todayStringElement) {
-      return (
-        <p className="NoticeCircle"></p>
-      )
-    }else if (dayStringElement < todayStringElement){
+    if (todayUserData === undefined) {
+      return (<p> / </p>)
+    }
+
+    if (dayStringElement === todayStringElement) {
       let userDataKeys = ["AbsTraining", "LegTraining", "PectoralTraining"]
       let cnt = 0;
-      for (var i=0; i < userDataKeys.length; i++){
+      for (i=0; i < userDataKeys.length; i++){
         if (todayUserData["target"][userDataKeys[i]] > todayUserData["training"][userDataKeys[i]]){
           cnt++;
         }
       }
       if (cnt === 0){
-        return (
-          <p>達成！</p>
-        )
-      }else{
-        return (<p>未達成...</p>)
+        return (<div className="gohi">達成！</div>)
+      }
+      else{
+        return (<div className="gohi">未達成</div>)
+      }
+    }else if (dayStringElement < todayStringElement){
+      let userDataKeys = ["AbsTraining", "LegTraining", "PectoralTraining"]
+      let cnt = 0;
+      for (i=0; i < userDataKeys.length; i++){
+        if (todayUserData["target"][userDataKeys[i]] > todayUserData["training"][userDataKeys[i]]){
+          cnt++;
+        }
+      }
+      if (cnt === 0){
+        return (<div className="CircleGood"></div>)
+      }
+      else if (cnt === 1){
+        return (<div className="CircleNice"></div>)
+      }
+      else if (cnt === 2){
+        return (<div className="Traiangle"></div>)
+      }
+      else{
+        return (<div className="CircleBad"></div>)
       }
     }else{
-      return (<p className="NoticeCircle"></p>)
+      return (<p></p>)
     }
 
   }
@@ -76,7 +95,8 @@ export const Day = (props) => {
         className="flex-1 cursor-pointer"
         onClick={() => {
           setDaySelected(day);
-          TrainingDays.includes(day.format("d"))? alert("休息日です") : setShowEventModal(true)
+          todayStringElement >= dayjs(day).format("YYYY/MM/DD") && userTrainingData[dayjs(day).format("YYYY/MM/DD")] !== undefined
+           ? setShowEventModal(true) : setDaySelected(day)
         }}
       >
         <div id={ (parseInt(day.format("MM"))-1) !== monthIndex%12 ? "DifferentMonth" : ""}>

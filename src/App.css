@@ -392,6 +392,39 @@ video {
 }
 
 
+.CircleGood, .CircleNice, .CircleBad, .Traiangle {
+  width: 15px;
+  height: 15px;
+  margin: auto;
+  margin-top: 15px;
+  border-radius: 50%;
+}
+
+.CircleGood {
+  background-color: green;
+}
+
+.CircleNice {
+  background-color: greenyellow;
+}
+
+.Traiangle {
+  background-color: yellow;
+}
+
+.CircleBad {
+  background-color: red;
+}
+
+.gohi {
+  margin: auto;
+  margin-top: 20px;
+}
+
+
+
+
+
 
 /* canvas {
   position: fixed;
@@ -486,6 +519,11 @@ video {
     margin-top: 10px;
   }
 
+  .gohi {
+    margin: auto;
+    margin-top: 2px;
+  }
+
   #DifferentMonth p.NoticeCircle {
     width: 8px;
     height: 8px;
@@ -532,6 +570,13 @@ video {
 
   .GraphContent {
     width: 300px;
+  }
+
+  .CircleGood, .CircleNice, .CircleBad, .Traiangle {
+    width: 10px;
+    height: 10px;
+    margin: auto;
+    margin-top: 8px;
   }
 
 }

@@ -40,7 +40,7 @@ let didInit = false;
 
 function App() {
 
-  const { setUserTrainingData } = useContext(GlobalContext);
+  const { setUserTrainingData, userTrainingData } = useContext(GlobalContext);
 
   const Auth = () => {
     const res = localStorage.length >= 2 ? true : false;
@@ -50,13 +50,57 @@ function App() {
     if (localStorage.getItem("Login") !== "yes") {
         return false;
     }
-
     return true;
   }
   
   const LoggedIn = Auth();
   const UserId = localStorage.getItem("UserId");
   const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
+
+  const createTrainingMenu = () => {
+    let Abs = 0;
+    let Leg = 0;
+    let Pectoral = 0;
+    let cnt = 0;
+    let addCount = 0;
+    for (var i=1; i<3; i++){
+      let pastday = dayjs().add(-i,"day").format("YYYY/MM/DD").toString()
+      if (userTrainingData[pastday] !== undefined){
+        Abs += userTrainingData[pastday]["target"]["AbsTraining"] + userTrainingData[pastday]["training"]["AbsTraining"];
+        Leg += userTrainingData[pastday]["target"]["LegTraining"] + userTrainingData[pastday]["training"]["LegTraining"];
+        Pectoral += userTrainingData[pastday]["target"]["PectoralTraining"]  + userTrainingData[pastday]["target"]["PectoralTraining"];
+
+        if (userTrainingData[pastday]["target"]["AbsTraining"] === userTrainingData[pastday]["training"]["AbsTraining"]){
+          cnt++;
+        }
+        if (userTrainingData[pastday]["target"]["LegTraining"] === userTrainingData[pastday]["training"]["LegTraining"]){
+          cnt++;
+        }
+        if (userTrainingData[pastday]["target"]["PectoralTraining"] === userTrainingData[pastday]["target"]["PectoralTraining"]){
+          cnt++;
+        }
+      }
+    }
+
+    if (cnt === 6){
+      addCount = 10;
+    }else if (cnt === 5 || cnt === 4) {
+      addCount = 5
+    }
+
+    return {
+      target : {
+        "AbsTraining" : Abs / 4 | 0 + addCount,
+        "LegTraining" : Leg / 4 | 0 + addCount,
+        "PectoralTraining" : Pectoral / 4 | 0 + addCount,
+      },
+      training : {
+        "AbsTraining" : 0,
+        "LegTraining" : 0,
+        "PectoralTraining" : 0,
+      }
+    }
+  }
 
   useEffect(() => {
     const getUserTrainingData = async (UserId) => {
@@ -87,10 +131,9 @@ function App() {
         };
     
         const UploadCoordinate = collection(db, "TrainingData");
-        console.log(defaultData, didInit);
         await setDoc(doc(UploadCoordinate, UserId), defaultData);
         
-        return defaultData
+        return defaultData.TrainingData
       }
     }
 
@@ -99,29 +142,17 @@ function App() {
         const result = await getUserTrainingData(UserId);
 
         if (result[Today] === undefined) {
-          result[Today] = {
-            target : {
-              "AbsTraining" : 30,
-              "LegTraining" : 30,
-              "PectoralTraining" : 30,
-            },
-            training : {
-              "AbsTraining" : 0,
-              "LegTraining" : 0,
-              "PectoralTraining" : 0,
-            }
-          }
-          await setDoc(doc(collection(db,"TrainingData"), UserId), result);
+          
+          result[Today] = createTrainingMenu()
+      
+          await setDoc(doc(collection(db,"TrainingData"), UserId), {TrainingData : result});
         }
         
-        
-        setUserTrainingData(result);
-        console.log(result)
-
+        await setUserTrainingData(result);
         didInit = true;
       }
     }
-  }, [LoggedIn, UserId, setUserTrainingData])
+  }, [LoggedIn, UserId, setUserTrainingData,Today])
 
   return (
     <>

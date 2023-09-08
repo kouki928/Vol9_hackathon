@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { MdDeleteForever, MdClose } from "react-icons/md";
 import GlobalContext from "../../context/GlobalContext";
-import { Menu } from "../Home/TrainingMenu";
+import dayjs from "dayjs";
 
 export const EventModal = () => {
-  const { daySelected, setShowEventModal, dispatchCalEvent, selectedEvent } =
+  const { daySelected, setShowEventModal, dispatchCalEvent, selectedEvent, userTrainingData } =
     useContext(GlobalContext);
   // const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
 
@@ -23,6 +23,31 @@ export const EventModal = () => {
   //   }
   //   setShowEventModal(false);
   // };
+
+  if (userTrainingData === {}){
+    return (<></>)
+  }
+
+  const TodayData = userTrainingData[dayjs(daySelected).format("YYYY/MM/DD")]
+  
+  const Menu = [
+
+    {
+      title : "腹筋",
+      type  : "AbsTraining",
+      count : TodayData["target"]["AbsTraining"],
+    },
+    {
+      title : "胸筋",
+      type  : "PectoralTraining",
+      count : TodayData["target"]["PectoralTraining"],
+    },
+    {
+      title : "足筋",
+      type  : "LegTraining",
+      count : TodayData["target"]["LegTraining"],
+    },
+  ]
 
   return (
     <div className="h-screen w-full fixed left-0 top-0 flex justify-center items-center">

@@ -1,4 +1,4 @@
-import React, { Component, useContext, useEffect } from 'react';
+import React, { Component, useContext } from 'react';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-webgl';
@@ -85,8 +85,9 @@ class PoseDetection extends Component {
 
       const scaleFactorX = this.width / 640;
       const scaleFactorY = this.height / 480;
-
+      
       for (var i=0; i<keypoints.keypoints.length; i++){
+
         if (keypointInd.right.includes(i)){
           ctx.fillStyle = 'Orange';
         }else if (keypointInd.left.includes(i)){
