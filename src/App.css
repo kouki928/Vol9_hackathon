@@ -1,0 +1,537 @@
+.header {
+  display: none;
+  padding: 10px;
+  background-color: #2d445d;
+  color: white;
+  width: 100%;
+}
+
+.footer {
+  display: none;
+}
+
+.App {
+  text-align: center;
+  width: 100%;
+  height: 100vh -52px;
+  display: flex;
+  /* justify-content: center; */
+  /* align-items: center; */
+}
+
+.Main {
+  flex: auto;
+  padding-left: 250px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.Sidebar {
+  height: 100vh;
+  width: 250px;
+  background-color: #2d445d;
+  position: fixed;
+}
+
+.SidebarList {
+  height: auto;
+  padding: 0;
+  width: 100%;
+}
+
+.SidebarList #active {
+  background-color: #3b627a;
+}
+
+.SidebarList .row {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  color: white;
+  align-items: center;
+  justify-content: center;
+}
+
+.SidebarList .row:hover {
+  cursor: pointer;
+  background-color: #3b627a;
+}
+
+.row #icon {
+  flex: 30%;
+  display: grid;
+  place-items: center;
+}
+
+.row #title {
+  flex: 70%;
+  text-align: start;
+  margin-left: 20px;
+}
+
+.SidebarIcon {
+  padding-top: 20px;
+  padding-bottom: 15px;
+  text-align: center;
+}
+
+.SidebarIcon .Icon {
+  width: 100%;
+}
+
+.SidebarIcon p{
+  font-weight: 600;
+  font-size: 13px;
+  color: white;
+}
+
+.nav-toggle {
+  width: 100%;
+  height: 100%;
+  position: inherit;
+  z-index: 400;
+}
+
+.nav-toggle span {
+  width: 32px;
+  height: 2px;
+  /* margin: 8px 0; */
+  left: 10px;
+  display: inline-block;
+  position: absolute;
+  z-index: 300;
+  background: white;
+  -webkit-transition: .35s ease-in-out;
+  -moz-transition: .35s ease-in-out;
+  transition: .35s ease-in-out;
+}
+
+.nav-toggle span:nth-of-type(1) {
+  top: 14px;
+}
+
+.nav-toggle span:nth-of-type(2) {
+  top: 23px;
+}
+
+.nav-toggle span:nth-of-type(3) {
+  top: 32px;
+}
+
+.nav-toggle#active span:nth-of-type(1) {
+  top: 14px;
+  left: 10px;
+  transform: translateY(8px) rotate(-45deg);
+  width: 33px;
+}
+
+.nav-toggle#active span:nth-of-type(2) {
+  opacity: 0;/*真ん中の線は透過*/
+}
+
+.nav-toggle#active span:nth-of-type(3){
+  top: 30px;
+  left: 10px;
+  transform: translateY(-8px) rotate(45deg);
+  width: 33px;
+}
+
+.Subbar {
+  display: none;
+}
+
+
+.Form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2d445d;
+  color: white;
+  margin: 0 auto;
+  width: 100%;
+  height: 100vh;
+}
+
+.wrap {
+  padding: 1.25rem;
+  display: block;
+  width: 300px;
+  background-color: #3b627a;
+  border-radius: 6px;
+}
+
+.wrap h2 {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+.InputLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+input {
+  max-width: 100%;
+  width: 100%;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  padding-bottom: calc(0.5em - 1px);
+  padding-left: calc(0.75em - 1px);
+  padding-right: calc(0.75em - 1px);
+  padding-top: calc(0.5em - 1px);
+  position: relative;
+  vertical-align: top;
+  color: black;
+}
+
+.SignIn {
+  display: none;
+}
+
+.SignIn#active {
+  margin-top: 10px;
+  display: block;
+}
+
+.GuideButton{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.LoginButton {
+  /* margin-left: 1rem; */
+  padding: 10px 15px;
+  border-radius: 6px;
+  background-color: #2d445d;
+}
+
+.LRToggle {
+  font-size: small;
+}
+
+
+/* ホーム ----------------------------------------------------------------------------- */
+
+.StartTraining {
+  display: block;
+  text-align: center;
+  padding: 24px;
+}
+
+.StartTraining img {
+  margin: 30px auto 0 auto;
+  width: 100px;
+  height: 100px;
+}
+
+.StartTraining h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.discription {
+  margin: 16px 0;
+}
+
+.StartButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #3b627a;
+  color: white;
+  width: 300px;
+  border-radius: 6px;
+  margin: auto;
+  padding: 12px 15px
+}
+
+.StartButtonIcon {
+  margin-left: 10px;
+}
+
+.StartButtonTitle {
+  margin: auto;
+}
+
+.StartButtonAllow {
+  margin-right: 5px;
+}
+
+.TrainingMenu {
+  display: block;
+  padding: 14px;
+  margin: auto;
+  width: 320px;
+  background-color: rgb(227, 227, 227);
+  border-radius: 6px;
+}
+
+.TrainingMenu p {
+  text-align: center;
+  font-weight: 600;
+  padding-bottom: 12px;
+}
+
+.TrainingText {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #3b627a;
+  color: white;
+  width: 250px;
+  border-radius: 5px;
+  margin: 10px auto;
+  padding: 10px;
+}
+.TrainingText:hover{
+  background-color: #2d445d;
+}
+
+.TrainingTitle {
+  margin-right: auto;
+  margin-left: 10px;
+}
+
+.TrainingCount {
+  margin-right: 10px;
+}
+
+.CameraWrapper {
+  width: 100%;
+
+}
+
+.canvas {
+  padding: 24px;
+  margin: auto;
+}
+
+video {
+  visibility: hidden;
+  display: none;
+}
+
+
+/* カレンダー ---------------------------------------------------------------- */
+
+
+.CalendarArea {
+  height: 90vh;
+  margin: auto;
+  padding: 0 25px;
+}
+
+.CalendarModalForm {
+  width: 300px;
+}
+
+.CalendarModalButton {
+  background-color: #2d445d;
+}
+
+.CalendarDays {
+  display: flex;
+  justify-content: space-around;
+  font-weight: 500;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.ModalTitle {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+#DifferentMonth {
+  color: #c3c3c3;
+  font-weight: 500;
+}
+
+#DifferentMonth p.NoticeCircle {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background: #c3c3c3;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.NoticeCircle {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background: #2d445d;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.GraphContents {
+  margin: auto;
+}
+
+.GraphContent {
+  margin-top: 25px;
+}
+
+.GraphContent {
+  width: 500px;
+  margin: 30px auto;
+}
+
+
+
+/* canvas {
+  position: fixed;
+  width: 100%;
+} */
+
+
+@media screen and (max-width: 900px) {
+  .App {
+    margin-bottom: 50px;
+  }
+
+  .Main {
+    padding-left: 0;
+  }
+
+  .GraphContent {
+    margin: auto;
+  }
+
+  .header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .header .HamburgerMenu {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header .headerTitle {
+    margin-left: 10px;
+  }
+
+  .header .headerIcon {
+    margin-left: 20px;
+  }
+
+  .nav-toggle {
+    z-index: 400;
+  }
+
+  .Sidebar {
+    display: none;
+  }
+
+  .Subbar {
+    display: none;
+  }
+
+  .Subbar#active {
+    display: block;
+  }
+
+  .Subbar#active .overlay {
+    display: block;
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background-color:rgba(0,0,0,0.5);
+    z-index: 100;
+  }
+
+  .Subbar#active .Sidebar {
+    display: block;
+    position: fixed;
+    top:0;
+    left:0;
+    width:250px;
+    height:100vh;
+    background-color: #2d445d;
+    z-index: 200;
+  }
+
+  .CalendarArea {
+    padding: 10px;
+    height: 80vh;
+  }
+
+  .CalendarDayBox {
+    border-width: 0px;
+    border-top: 1px solid #acacac;
+    margin-bottom: 10px;
+  }
+
+  p.NoticeCircle {
+    width: 8px;
+    height: 8px;
+    margin-top: 10px;
+  }
+
+  #DifferentMonth p.NoticeCircle {
+    width: 8px;
+    height: 8px;
+    margin-top: 10px;
+  }
+
+  .footer {
+    display: block;
+    width: 100%;
+    padding: 0 1.5rem;
+    /* background-color: rgb(243, 242, 242); */
+    background-color: #2d445d;
+    color: white;
+    border-top: 1px solid #acacac;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+  }
+
+  .FooterWrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .FooterIcon {
+    display: grid;
+    place-items: center;
+  }
+
+  .FooterTitle {
+    text-align: center;
+    font-size: 10px;
+  }
+
+  .NotCurrentPage {
+    flex: 1;
+  }
+
+  .CurrentPage {
+    flex: 1;
+    background-color: #3b627a;
+    border-radius: 10px;
+  }
+
+  .GraphContent {
+    width: 300px;
+  }
+
+}
