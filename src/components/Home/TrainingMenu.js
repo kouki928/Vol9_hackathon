@@ -3,14 +3,17 @@ import VideocamIcon from '@mui/icons-material/Videocam';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import GlobalContext from '../../context/GlobalContext';
 import dayjs from 'dayjs';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+const MySwal = withReactContent(Swal)
+
 
 function TrainingMenu() {
 
-  const { setTrainingType, userTrainingData } = useContext(GlobalContext)  
+  const { setTrainingType } = useContext(GlobalContext)  
 
-  if (userTrainingData === {}){
-    return (<></>)
-  }
+  const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
 
   const TodayData = userTrainingData[dayjs().format("YYYY/MM/DD")]
 
@@ -20,21 +23,21 @@ function TrainingMenu() {
   
   const Menu = [
     {
-      title : "腹筋",
+      title : "上体起こし",
       type  : "AbsTraining",
-      count : TodayData["target"]["AbsTraining"],
+      count : TodayData["target"]["AbsTraining"] - TodayData["training"]["AbsTraining"],
       link  : "?classification=AbsTraining"
     },
     {
-      title : "胸筋",
+      title : "腕立て伏せ",
       type  : "PectoralTraining",
-      count : TodayData["target"]["PectoralTraining"],
+      count : TodayData["target"]["PectoralTraining"]- TodayData["training"]["PectoralTraining"],
       link  : "?classification=PectoralTraining"
     },
     {
-      title : "足筋",
+      title : "スクワット",
       type  : "LegTraining",
-      count : TodayData["target"]["LegTraining"],
+      count : TodayData["target"]["LegTraining"]- TodayData["training"]["LegTraining"],
       link  : "?classification=LegTraining"
     },
   ]
@@ -49,12 +52,16 @@ function TrainingMenu() {
               <li key={key} className='TrainingText' onClick={
                 () => {
                   setTrainingType(value.type);
-                  window.location.href = `/training${value.link}`;
+                  value.count !== 0 ? window.location.href = `/training${value.link}` : MySwal.fire({
+                    title : "完了済み！",
+                    text : "今日は別のトレーニングを行いましょう！",
+                    icon : "success"
+                  });
                 }
               }>
                 <div className='StartButtonIcon'><VideocamIcon /></div>
-                <div className='TrainingTitle'>{value.title}</div>
-                <div className='TrainingCount'>{value.count} 回</div>
+                <div className='TrainingTitle'>{value.count !== 0 ? value.title : <s>{value.title}</s>}</div>
+                <div className='TrainingCount'>{value.count !== 0 ? <div>残り {value.count} 回</div> : <s>残り {value.count} 回</s>}</div>
                 <div className='StartButtonAllow'><KeyboardArrowRightIcon /></div>
               </li>
             )

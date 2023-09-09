@@ -47,6 +47,8 @@ class PoseDetection extends Component {
       
       let angle = null;
       let average_score = 0;
+      let right_average_score = 0
+      let left_average_score = 0
       let countRef = parseInt(localStorage.getItem("count"))
       this.setState({
         count : countRef
@@ -59,54 +61,168 @@ class PoseDetection extends Component {
         return
       }
 
-      // 必要なジョイントの座標を取得＆格納
-  
-      if (which === "PectoralTraining") {
-        angle = calculateAngleWithin180(
-          keypoints.keypoints[6].x, keypoints.keypoints[6].y,
-          keypoints.keypoints[8].x, keypoints.keypoints[8].y,
-          keypoints.keypoints[10].x, keypoints.keypoints[10].y,
-        );
 
-        average_score = (
+      if (which === "PectoralTraining") {
+        right_average_score = (
           keypoints.keypoints[6].score + 
           keypoints.keypoints[8].score +
           keypoints.keypoints[10].score
         ) / 3
-      } else if (which === "AbsTraining") {
-        angle = calculateAngleWithin180(
-          keypoints.keypoints[6].x, keypoints.keypoints[6].y,
-          keypoints.keypoints[12].x, keypoints.keypoints[12].y,
-          keypoints.keypoints[14].x, keypoints.keypoints[14].y,
-        );
+        left_average_score = (
+          keypoints.keypoints[5].score + 
+          keypoints.keypoints[7].score +
+          keypoints.keypoints[9].score
+        ) / 3
+        if (left_average_score <= right_average_score) {
+          average_score = right_average_score
+          angle = calculateAngleWithin180(
+            keypoints.keypoints[6].x, keypoints.keypoints[6].y,
+            keypoints.keypoints[8].x, keypoints.keypoints[8].y,
+            keypoints.keypoints[10].x, keypoints.keypoints[10].y,
+          );
+        }
+        else {
+          average_score = left_average_score
+          angle = calculateAngleWithin180(
+            keypoints.keypoints[5].x, keypoints.keypoints[5].y,
+            keypoints.keypoints[7].x, keypoints.keypoints[7].y,
+            keypoints.keypoints[9].x, keypoints.keypoints[9].y,
+          );
+        }
 
-        average_score = (
+        if (this.flag === false && angle > 160 && average_score > 0.6){
+          this.flag = true
+        }else if (this.flag === true && angle < 90 && average_score > 0.6){
+          localStorage.setItem("count", countRef+1);
+          this.flag = false
+          console.log("count", countRef+1)
+        }
+
+      // 腹筋
+      } else if (which === "AbsTraining") {
+        right_average_score = (
           keypoints.keypoints[6].score + 
           keypoints.keypoints[12].score +
           keypoints.keypoints[14].score
         ) / 3
+        left_average_score = (
+          keypoints.keypoints[5].score + 
+          keypoints.keypoints[11].score +
+          keypoints.keypoints[13].score
+        ) / 3
+        if (left_average_score <= right_average_score) {
+          average_score = right_average_score
+          angle = calculateAngleWithin180(
+            keypoints.keypoints[6].x, keypoints.keypoints[6].y,
+            keypoints.keypoints[12].x, keypoints.keypoints[12].y,
+            keypoints.keypoints[14].x, keypoints.keypoints[14].y,
+          );
+        }
+        else {
+          average_score = left_average_score
+          angle = calculateAngleWithin180(
+            keypoints.keypoints[5].x, keypoints.keypoints[5].y,
+            keypoints.keypoints[11].x, keypoints.keypoints[11].y,
+            keypoints.keypoints[13].x, keypoints.keypoints[13].y,
+          );
+        }
 
+        if (this.flag === false && angle > 130 && average_score > 0.6){
+          this.flag = true
+        }else if (this.flag === true && angle < 60 && average_score > 0.6){
+          localStorage.setItem("count", countRef+1);
+          this.flag = false
+          console.log("count", countRef+1)
+        }
+
+      // 足筋
       } else if (which === "LegTraining") {
-        angle = calculateAngleWithin180(
-          keypoints.keypoints[12].x, keypoints.keypoints[12].y,
-          keypoints.keypoints[14].x, keypoints.keypoints[14].y,
-          keypoints.keypoints[16].x, keypoints.keypoints[16].y,
-        );
-        average_score = (
+        right_average_score = (
           keypoints.keypoints[12].score + 
           keypoints.keypoints[14].score +
           keypoints.keypoints[16].score
         ) / 3
+        left_average_score = (
+          keypoints.keypoints[11].score + 
+          keypoints.keypoints[13].score +
+          keypoints.keypoints[15].score
+        ) / 3
+        if (left_average_score <= right_average_score) {
+          average_score = right_average_score
+          angle = calculateAngleWithin180(
+            keypoints.keypoints[12].x, keypoints.keypoints[12].y,
+            keypoints.keypoints[14].x, keypoints.keypoints[14].y,
+            keypoints.keypoints[16].x, keypoints.keypoints[16].y,
+          );
+        }
+        else {
+          average_score = left_average_score
+          angle = calculateAngleWithin180(
+            keypoints.keypoints[11].x, keypoints.keypoints[11].y,
+            keypoints.keypoints[13].x, keypoints.keypoints[13].y,
+            keypoints.keypoints[15].x, keypoints.keypoints[15].y,
+          );
+        }
+
+        if (this.flag === false && angle > 160 && average_score > 0.6){
+          this.flag = true
+        }else if (this.flag === true && angle < 100 && average_score > 0.6){
+          localStorage.setItem("count", countRef+1);
+          this.flag = false
+          console.log("count", countRef+1)
+        }
       }
 
 
-      if (this.flag === false && angle > 130 && average_score > 0.6){
-        this.flag = true
-      }else if (this.flag === true && angle < 60 && average_score > 0.6){
-        localStorage.setItem("count", countRef+1);
-        this.flag = false
-        console.log("count", countRef+1)
-      }
+
+      // 必要なジョイントの座標を取得＆格納
+  
+      // if (which === "PectoralTraining") {
+      //   angle = calculateAngleWithin180(
+      //     keypoints.keypoints[6].x, keypoints.keypoints[6].y,
+      //     keypoints.keypoints[8].x, keypoints.keypoints[8].y,
+      //     keypoints.keypoints[10].x, keypoints.keypoints[10].y,
+      //   );
+
+      //   average_score = (
+      //     keypoints.keypoints[6].score + 
+      //     keypoints.keypoints[8].score +
+      //     keypoints.keypoints[10].score
+      //   ) / 3
+      // } else if (which === "AbsTraining") {
+      //   angle = calculateAngleWithin180(
+      //     keypoints.keypoints[6].x, keypoints.keypoints[6].y,
+      //     keypoints.keypoints[12].x, keypoints.keypoints[12].y,
+      //     keypoints.keypoints[14].x, keypoints.keypoints[14].y,
+      //   );
+
+      //   average_score = (
+      //     keypoints.keypoints[6].score + 
+      //     keypoints.keypoints[12].score +
+      //     keypoints.keypoints[14].score
+      //   ) / 3
+
+      // } else if (which === "LegTraining") {
+      //   angle = calculateAngleWithin180(
+      //     keypoints.keypoints[12].x, keypoints.keypoints[12].y,
+      //     keypoints.keypoints[14].x, keypoints.keypoints[14].y,
+      //     keypoints.keypoints[16].x, keypoints.keypoints[16].y,
+      //   );
+      //   average_score = (
+      //     keypoints.keypoints[12].score + 
+      //     keypoints.keypoints[14].score +
+      //     keypoints.keypoints[16].score
+      //   ) / 3
+      // }
+
+
+      // if (this.flag === false && angle > 130 && average_score > 0.6){
+      //   this.flag = true
+      // }else if (this.flag === true && angle < 60 && average_score > 0.6){
+      //   localStorage.setItem("count", countRef+1);
+      //   this.flag = false
+      //   console.log("count", countRef+1)
+      // }
 
       // // カウンターを開始するための条件
       // if (!counting && angle !== null && angle > 100) {
@@ -457,7 +573,7 @@ class PoseDetection extends Component {
             </div>
           </div>
 
-          <div onClick={
+          <div className='TrainingButton' onClick={
             async () => {
               userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType] = this.state.count
               localStorage.setItem("userTrainingData", JSON.stringify(userTrainingData))

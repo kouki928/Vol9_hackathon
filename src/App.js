@@ -11,6 +11,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Setting from './components/Setting';
 // import LiveCamera from './components/TrainingCamera/LiveCamera';
 import PoseDetection from './components/TrainingCamera/LiveCamera';
+// import firebase from "firebase/firebase";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import GlobalContext from './context/GlobalContext';
@@ -79,7 +80,7 @@ function App() {
         if (userTrainingData[pastday]["target"]["LegTraining"] === userTrainingData[pastday]["training"]["LegTraining"]){
           cnt++;
         }
-        if (userTrainingData[pastday]["target"]["PectoralTraining"] === userTrainingData[pastday]["target"]["PectoralTraining"]){
+        if (userTrainingData[pastday]["target"]["PectoralTraining"] === userTrainingData[pastday]["training"]["PectoralTraining"]){
           cnt++;
         }
       }
@@ -156,7 +157,7 @@ function App() {
         didInit = true;
       }
     }
-  }, [LoggedIn, UserId])
+  }, [LoggedIn, UserId, Today, setUserTrainingData])
 
   return (
     <>

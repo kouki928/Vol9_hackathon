@@ -291,9 +291,9 @@ input {
   align-items: center;
   background-color: #3b627a;
   color: white;
-  width: 250px;
+  width: 270px;
   border-radius: 5px;
-  margin: 10px auto;
+  margin: 15px auto;
   padding: 10px;
 }
 .TrainingText:hover{
@@ -307,6 +307,10 @@ input {
 
 .TrainingCount {
   margin-right: 10px;
+}
+
+.TrainingCount p{
+  font-size: large;
 }
 
 .CameraWrapper {
@@ -341,6 +345,16 @@ video {
   border: #2d445d solid 1px;
 
   font-size: 30px;
+}
+
+.TrainingButton {
+  width: 200px;
+  font-size: 30px;
+  padding: 12px;
+  margin: 30px auto;
+  border-radius: 5px;
+  color: white;
+  background-color: #3b627a;
 }
 
 
@@ -440,8 +454,22 @@ video {
   margin-top: 20px;
 }
 
+.CalendarTrainingText {
+  background-color: #3b627a;
+  color: white;
+  margin: 10px;
+  border-radius: 5px;
+}
 
+.ModalListWrapper {
+  display: flex;
+  padding: 4px 4px;
+  align-items: center;
+}
 
+progress {
+  color: white;
+}
 
 
 

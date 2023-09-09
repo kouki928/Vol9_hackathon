@@ -2,10 +2,17 @@ import React, { useContext } from "react";
 import { MdDeleteForever, MdClose } from "react-icons/md";
 import GlobalContext from "../../context/GlobalContext";
 import dayjs from "dayjs";
+// import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+// import { Pie } from 'react-chartjs-2';
+
+// ChartJS.register(ArcElement, Tooltip, Legend);
 
 export const EventModal = () => {
-  const { daySelected, setShowEventModal, dispatchCalEvent, selectedEvent, userTrainingData } =
+  const { daySelected, setShowEventModal, dispatchCalEvent, selectedEvent } =
     useContext(GlobalContext);
+
+  const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
+  
   // const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
 
   // const handleSubmit = (e) => {
@@ -33,19 +40,23 @@ export const EventModal = () => {
   const Menu = [
 
     {
-      title : "腹筋",
+      title : "上体起こし",
       type  : "AbsTraining",
-      count : TodayData["target"]["AbsTraining"],
+      count : TodayData["training"]["AbsTraining"],
+      target: TodayData["target"]["AbsTraining"],
     },
     {
-      title : "胸筋",
+      title : "腕立て伏せ",
       type  : "PectoralTraining",
-      count : TodayData["target"]["PectoralTraining"],
+      count : TodayData["training"]["PectoralTraining"],
+      target: TodayData["target"]["PectoralTraining"],
+
     },
     {
-      title : "足筋",
+      title : "スクワット",
       type  : "LegTraining",
-      count : TodayData["target"]["LegTraining"],
+      target: TodayData["target"]["LegTraining"],
+      count : TodayData["training"]["LegTraining"],
     },
   ]
 
@@ -86,9 +97,12 @@ export const EventModal = () => {
             <ul>
               {Menu.map((value, key) => {
                 return (
-                  <li key={key} className='TrainingText'>
-                    <div className='TrainingTitle'>{value.title}</div>
-                      <div className='TrainingCount'>{value.count} 回</div>
+                  <li key={key} className="CalendarTrainingText">
+                    <div className='ModalListWrapper'>
+                      <div className='TrainingTitle'>{value.title}</div>
+                      <div className='TrainingCount'>{value.count} / {value.target} 回</div>
+                    </div>
+                    <div> 達成率 : <progress max="100" value={value.count / value.target * 100 | 0}>{value.count / value.target * 100 | 0}%</progress></div>
                   </li>
                 )
               })}
