@@ -6,33 +6,38 @@ import dayjs from 'dayjs';
 
 function TrainingMenu() {
 
-  const { setTrainingType, userTrainingData } = useContext(GlobalContext)
+  const { setTrainingType, userTrainingData } = useContext(GlobalContext)  
 
   if (userTrainingData === {}){
     return (<></>)
   }
 
   const TodayData = userTrainingData[dayjs().format("YYYY/MM/DD")]
+
+  if (TodayData === undefined) {
+    return (<></>)
+  }
   
   const Menu = [
-
     {
       title : "腹筋",
       type  : "AbsTraining",
       count : TodayData["target"]["AbsTraining"],
+      link  : "?classification=AbsTraining"
     },
     {
       title : "胸筋",
       type  : "PectoralTraining",
       count : TodayData["target"]["PectoralTraining"],
+      link  : "?classification=PectoralTraining"
     },
     {
       title : "足筋",
       type  : "LegTraining",
       count : TodayData["target"]["LegTraining"],
+      link  : "?classification=LegTraining"
     },
   ]
-
 
   return (
     <div className='TrainingMenu'>
@@ -43,8 +48,8 @@ function TrainingMenu() {
             return (
               <li key={key} className='TrainingText' onClick={
                 () => {
-                  setTrainingType(exchangeMenu[key]);
-                  window.location.pathname = `/training`;
+                  setTrainingType(value.type);
+                  window.location.href = `/training${value.link}`;
                 }
               }>
                 <div className='StartButtonIcon'><VideocamIcon /></div>
@@ -60,29 +65,3 @@ function TrainingMenu() {
 }
 
 export default TrainingMenu
-
-
-export const Menu = [
-
-    {
-        title : "腹筋",
-        type  : "AbsTraining",
-        count : 30,
-    },
-    {
-        title : "胸筋",
-        type  : "PectoralTraining",
-        count : 30,
-    },
-    {
-        title : "足筋",
-        type  : "LegTraining",
-        count : 50,
-    },
-]
-
-const exchangeMenu = {
-  AbsTraining : "腹筋",
-  LegTraining : "足筋",
-  PectoralTraining : "胸筋",
-}

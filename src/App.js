@@ -40,7 +40,7 @@ let didInit = false;
 
 function App() {
 
-  const { setUserTrainingData, userTrainingData } = useContext(GlobalContext);
+  const { setUserTrainingData } = useContext(GlobalContext);
 
   const Auth = () => {
     const res = localStorage.length >= 2 ? true : false;
@@ -63,6 +63,7 @@ function App() {
     let Pectoral = 0;
     let cnt = 0;
     let addCount = 0;
+    const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
     for (var i=1; i<3; i++){
       let pastday = dayjs().add(-i,"day").format("YYYY/MM/DD").toString()
       if (userTrainingData[pastday] !== undefined){
@@ -148,11 +149,12 @@ function App() {
           await setDoc(doc(collection(db,"TrainingData"), UserId), {TrainingData : result});
         }
         
-        await setUserTrainingData(result);
+        setUserTrainingData(result);
+        localStorage.setItem("userTrainingData", JSON.stringify(result))
         didInit = true;
       }
     }
-  }, [LoggedIn, UserId, setUserTrainingData,Today])
+  }, [LoggedIn, UserId])
 
   return (
     <>

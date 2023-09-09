@@ -49,5 +49,13 @@ export const HamburgerMenuData = {
     "/training" : {
         title : "トレーニング",
         icon  : <VideocamIcon />
-    }
+    },
+    // "/training%3Fclassification=%E8%83%B8%E7%AD%8B" : {
+    //     title : "トレーニング",
+    //     icon  : <VideocamIcon />
+    // },
+    // "/training%3Fclassification=%E8%B6%B3%E7%AD%8B" : {
+    //     title : "トレーニング",
+    //     icon  : <VideocamIcon />
+    // }
 }

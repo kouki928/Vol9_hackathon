@@ -324,6 +324,28 @@ video {
   display: none;
 }
 
+.TrainingCounter {
+  display: block;
+  width: 700px;
+  margin: auto;
+}
+
+.CounterHeader, .CounterBox {
+  display: flex;
+}
+
+.CounterBox {
+
+}
+
+.CounterHeader h2, .CounterBox h2 {
+  flex: 1;
+  text-align: center;
+  border: #2d445d solid 1px;
+
+  font-size: 30px;
+}
+
 
 /* カレンダー ---------------------------------------------------------------- */
 

@@ -5,8 +5,10 @@ import GlobalContext from "../../context/GlobalContext";
 export const Day = (props) => {
   const { day } = props;
   // const [dayEvents, setDayEvents] = useState([]);
-  const { setDaySelected, setShowEventModal, monthIndex, userTrainingData } =
+  const { setDaySelected, setShowEventModal, monthIndex } =
     useContext(GlobalContext);
+
+  const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
 
   const todayStringElement = dayjs().format("YYYY/MM/DD").toString()
 
@@ -26,8 +28,8 @@ export const Day = (props) => {
       return (<p> / </p>)
     }
 
-    if (todayUserData === undefined) {
-      return (<p> / </p>)
+    if (todayUserData === undefined && todayStringElement < dayStringElement) {
+      return (<p>  </p>)
     }
 
     if (dayStringElement === todayStringElement) {
