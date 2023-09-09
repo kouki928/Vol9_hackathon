@@ -5,6 +5,8 @@ import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-webgpu';
 import GlobalContext from '../../context/GlobalContext';
 import dayjs from 'dayjs';
+import { collection, doc, setDoc } from 'firebase/firestore';
+import { db } from '../../App';
 
 class PoseDetection extends Component {
 
@@ -19,7 +21,8 @@ class PoseDetection extends Component {
     this.height = window.innerWidth > 900 ? 480 : 240;
     this.trainingType = new URL(decodeURI(window.location.href)).searchParams.get("classification");
     this.state = {
-      count : 0,
+      count : JSON.parse(localStorage.getItem("userTrainingData"))[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType],
+      buttonText : "中断する"
     }
     this.flag = false
   }
@@ -50,7 +53,9 @@ class PoseDetection extends Component {
       })
 
       if (this.state.count === goal_count){
-        console.log("終了!")
+        this.setState({
+          buttonText : "完了!"
+        })
         return
       }
 
@@ -146,7 +151,7 @@ class PoseDetection extends Component {
     const detector = createDetector();
     const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
     const Today = dayjs().format("YYYY/MM/DD")
-    localStorage.setItem("count", 0)
+    localStorage.setItem("count", this.state.count)
     const detectPose = async (video, canvas, detector) =>  {
 
       const ctx = canvas.getContext('2d');
@@ -431,7 +436,8 @@ class PoseDetection extends Component {
     //   console.log(userTrainingData, "{}じゃないときの処理")
     // }
 
-    const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
+    let userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
+    let userId = localStorage.getItem("UserId")
 
     return (
       <div className='Main'>
@@ -449,8 +455,16 @@ class PoseDetection extends Component {
               <h2>{this.state.count}</h2>
               <h2>{userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType]}</h2>
             </div>
-
           </div>
+
+          <div onClick={
+            async () => {
+              userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType] = this.state.count
+              localStorage.setItem("userTrainingData", JSON.stringify(userTrainingData))
+              await setDoc(doc(collection(db, "TrainingData"), userId), {TrainingData : userTrainingData});
+              window.location.href = "/"
+            }
+          }>{this.state.buttonText}</div>
         </div>
       </div>
     );

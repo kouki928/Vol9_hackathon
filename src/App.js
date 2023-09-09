@@ -62,11 +62,13 @@ function App() {
     let Leg = 0;
     let Pectoral = 0;
     let cnt = 0;
+    let days = 0
     let addCount = 0;
     const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
     for (var i=1; i<3; i++){
       let pastday = dayjs().add(-i,"day").format("YYYY/MM/DD").toString()
       if (userTrainingData[pastday] !== undefined){
+        days++;
         Abs += userTrainingData[pastday]["target"]["AbsTraining"] + userTrainingData[pastday]["training"]["AbsTraining"];
         Leg += userTrainingData[pastday]["target"]["LegTraining"] + userTrainingData[pastday]["training"]["LegTraining"];
         Pectoral += userTrainingData[pastday]["target"]["PectoralTraining"]  + userTrainingData[pastday]["target"]["PectoralTraining"];
@@ -83,17 +85,17 @@ function App() {
       }
     }
 
-    if (cnt === 6){
+    if (cnt === days*3){
       addCount = 10;
-    }else if (cnt === 5 || cnt === 4) {
+    }else if (cnt > days*2) {
       addCount = 5
     }
 
     return {
       target : {
-        "AbsTraining" : Abs / 4 | 0 + addCount,
-        "LegTraining" : Leg / 4 | 0 + addCount,
-        "PectoralTraining" : Pectoral / 4 | 0 + addCount,
+        "AbsTraining" : days !== 0 ? Abs / (days*2) | 0 + addCount : 30,
+        "LegTraining" : days !== 0 ? Leg / (days*2) | 0 + addCount : 30,
+        "PectoralTraining" : days !== 0 ? Pectoral / (days*2) | 0 + addCount : 30,
       },
       training : {
         "AbsTraining" : 0,

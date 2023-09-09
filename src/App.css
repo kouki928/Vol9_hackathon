@@ -326,7 +326,7 @@ video {
 
 .TrainingCounter {
   display: block;
-  width: 700px;
+  width: 640px;
   margin: auto;
 }
 
@@ -334,9 +334,6 @@ video {
   display: flex;
 }
 
-.CounterBox {
-
-}
 
 .CounterHeader h2, .CounterBox h2 {
   flex: 1;
@@ -599,6 +596,10 @@ video {
     height: 10px;
     margin: auto;
     margin-top: 8px;
+  }
+
+  .TrainingCounter {
+    width: 300px;
   }
 
 }
