@@ -30,7 +30,7 @@ function Setting() {
         <div className='InputLabel'>保有ポイント : {point} pt </div>
         </div>
 
-        <div className='discription'>トレーニングで得たポイントを使ってお得に商品を買うことが出来ます。</div>
+        <div className='Pointdiscription'>トレーニングで得たポイントを使ってお得に商品を買うことが出来ます。</div>
         
       </div>
 
