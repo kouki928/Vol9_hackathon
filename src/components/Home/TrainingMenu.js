@@ -15,12 +15,11 @@ function TrainingMenu() {
 
   const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
 
-  
+  const TodayData = userTrainingData[dayjs().format("YYYY/MM/DD")]
 
   if (TodayData === undefined) {
     return (<></>)
   }
-  const TodayData = userTrainingData[dayjs().format("YYYY/MM/DD")]
   
   const Menu = [
     {

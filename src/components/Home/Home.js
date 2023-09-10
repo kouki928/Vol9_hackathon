@@ -2,7 +2,6 @@ import React from 'react';
 import macho from "../../images/macho.png";
 import TrainingMenu from './TrainingMenu';
 
-
 function Home() {
 
   return (
