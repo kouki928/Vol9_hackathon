@@ -1,9 +1,9 @@
 import React from 'react'
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import SettingsIcon from '@mui/icons-material/Settings';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import VideocamIcon from '@mui/icons-material/Videocam';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 export const SidebarData = [
     {
@@ -23,8 +23,8 @@ export const SidebarData = [
         link  : "/graph"
     },
     {
-        title : "詳細設定",
-        icon  : <SettingsIcon />,
+        title : "特典",
+        icon  : <LocalOfferIcon />,
         link  : "/setting"
     },
 ]
@@ -43,8 +43,8 @@ export const HamburgerMenuData = {
         icon  : <BarChartIcon />,
     },
     "/setting" : {
-        title : "詳細設定",
-        icon  : <SettingsIcon />,
+        title : "特典",
+        icon  : <LocalOfferIcon />,
     },
     "/training" : {
         title : "トレーニング",

@@ -17,6 +17,7 @@ function TrainingMenu() {
 
   const TodayData = userTrainingData[dayjs().format("YYYY/MM/DD")]
 
+  console.log(TodayData)
   if (TodayData === undefined) {
     return (<></>)
   }

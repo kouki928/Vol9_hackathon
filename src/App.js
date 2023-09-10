@@ -8,7 +8,7 @@ import Home from "./components/Home/Home";
 import FooterMenu from './components/FooterMenu';
 import Graph from './components/Graph';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import Setting from './components/Setting';
+import Setting from './components/Coupon/Setting';
 // import LiveCamera from './components/TrainingCamera/LiveCamera';
 import PoseDetection from './components/TrainingCamera/LiveCamera';
 // import firebase from "firebase/firebase";
@@ -116,14 +116,14 @@ function App() {
         return result;
       } else {
         // docSnap.data() will be undefined in this case
-        
+        let base = parseInt(localStorage.getItem("base"))
         const defaultData = {
           TrainingData : {
             [Today] : {
               target : {
-                AbsTraining : 30,
-                LegTraining : 30,
-                PectoralTraining : 30,
+                AbsTraining : base,
+                LegTraining : base,
+                PectoralTraining : base,
               },
               training : {
                 AbsTraining : 0,
@@ -155,6 +155,8 @@ function App() {
         setUserTrainingData(result);
         localStorage.setItem("userTrainingData", JSON.stringify(result))
         didInit = true;
+
+        console.log(result)
       }
     }
   }, [LoggedIn, UserId, Today, setUserTrainingData])
