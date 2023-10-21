@@ -24,6 +24,7 @@ function TrainingMenu() {
     console.log("No?",userTrainingData);
   }catch(e){
     console.log(e)
+
     const getUserTrainingData = async (UserId) => {
       const TrainingRef = doc(db, "TrainingData", UserId);
       const TrainingSnap = await getDoc(TrainingRef);
@@ -125,6 +126,7 @@ function TrainingMenu() {
     }
 
     userTrainingData = retn_userData();
+
     console.log("Yes?", userTrainingData)
   }
 
