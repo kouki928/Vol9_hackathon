@@ -19,11 +19,11 @@ function TrainingMenu() {
   const Today = dayjs().format("YYYY/MM/DD");
   const UserId = localStorage.getItem("UserId");
   var userTrainingData;
-  try {
-    userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
-    console.log("No?",userTrainingData);
-  }catch(e){
-    console.log(e)
+
+  userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
+  console.log("No?",userTrainingData);
+
+  if (userTrainingData == null){
 
     const getUserTrainingData = async (UserId) => {
       const TrainingRef = doc(db, "TrainingData", UserId);
