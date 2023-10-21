@@ -21,7 +21,9 @@ function TrainingMenu() {
   var userTrainingData;
   try {
     userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
+    console.log("No?",userTrainingData);
   }catch(e){
+    console.log(e)
     const getUserTrainingData = async (UserId) => {
       const TrainingRef = doc(db, "TrainingData", UserId);
       const TrainingSnap = await getDoc(TrainingRef);
@@ -123,11 +125,13 @@ function TrainingMenu() {
     }
 
     userTrainingData = retn_userData();
+    console.log("Yes?", userTrainingData)
   }
+
+  console.log(userTrainingData);
 
   const TodayData = userTrainingData[Today]
 
-  console.log(TodayData)
   if (TodayData === undefined) {
     return (<></>)
   }
