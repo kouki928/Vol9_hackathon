@@ -1,5 +1,5 @@
 import React, {useState, useRef } from 'react'
-import { db, app } from '../App';
+import { db, auth } from '../App';
 import { where, collection, getDocs, query, setDoc, doc } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword, signOut,
     createUserWithEmailAndPassword, onAuthStateChanged, } from "firebase/auth"
@@ -81,27 +81,34 @@ function Login() {
      * Emailとpasswordでログインが出来るようにする。
      * Firebaseで動かす。
      ---------------------------------------------------------------------- */
-    const emailAuth = async () => {
-        const auth = getAuth(app);
-
-        
-
+    const signUp = async (event) => {
+        try {
+            event.preventDefault()
+      
+            // const email = 
+            const password = el.inputPassword.value
+            await createUserWithEmailAndPassword(auth, email, password)
+          } catch (err) {
+            el.errorMessage.innerHTML = err.message
+            console.error(err)
+          }
     }
 
     return (
     <div className='Form'><div className='wrap'>
         <form>
             <div>
-                <label for="inputEmail">E-mail</label>
+                <label htmlFor="inputEmail">E-mail</label>
                 <input type="email" name="inputEmail" id="inputEmail"></input>
             </div>
             <div>
-                <label for="inputPassword">Password</label>
+                <label htmlFor="inputPassword">Password</label>
                 <input type="password" name="inputPassword" id="inputPassword"></input>
             </div>
-            <button type="submit" id="buttonSignin" aria-describedby="errorMessage">Sign in</button>
+            <button type="submit" id="buttonSignin" aria-describedby="errorMessage" onClick={signIn}>Sign in</button>
             <p> or </p>
-            <button type="button" id="buttonSignup" aria-describedby="errorMessage">Sign up</button>
+            <button type="button" id="buttonSignup" aria-describedby="errorMessage" onClick={signUp(this
+                )}>Sign up</button>
             <p id="errorMessage"></p>
         </form>
 {/* 

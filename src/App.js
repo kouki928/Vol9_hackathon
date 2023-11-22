@@ -14,6 +14,7 @@ import PoseDetection from './components/TrainingCamera/LiveCamera';
 // import firebase from "firebase/firebase";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import GlobalContext from './context/GlobalContext';
 import { collection, setDoc, doc, getDoc } from "firebase/firestore";
 import dayjs from "dayjs";
@@ -35,7 +36,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
 export const db = getFirestore(app);
 let didInit = false;
 
