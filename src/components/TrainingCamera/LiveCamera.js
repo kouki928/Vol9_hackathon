@@ -1,3 +1,8 @@
+/**Import ------------------------------------------------------------
+ * 以下のような形式で取得する。
+ * import { 関数 or 変数名 } from "url"
+ * また、別の場所でも使いたい場合は export を変数や関数の前に付ける
+ ------------------------------------------------------------------ */
 import React, { Component, useContext } from 'react';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs-core';
@@ -8,10 +13,18 @@ import dayjs from 'dayjs';
 import { collection, doc, setDoc } from 'firebase/firestore';
 import { db } from '../../App';
 
+
+/** PoseDetection ----------------------------------------------------------
+ * Componentクラスを継承したクラス。クラスである意味は特になく、検索結果の産物
+ * React内で変数のデータを共有するには useContext, useState という機能が使われるが、
+ * Class内では両方使用できないため注意。代わりに、 static ... で定義している。
+ -------------------------------------------------------------------------- */
 class PoseDetection extends Component {
 
+  // ここでuseContextを使えるようにしている。
   static contextType = useContext;
 
+  // Pythonでいう init のようなもの。this. = self. くらいの認識
   constructor(props) {
     super(props);
     this.videoRef = React.createRef();
@@ -20,18 +33,34 @@ class PoseDetection extends Component {
     this.width = window.innerWidth > 900 ? 640 : 320;
     this.height = window.innerWidth > 900 ? 480 : 240;
     this.trainingType = new URL(decodeURI(window.location.href)).searchParams.get("classification");
+
+    /** ------------------------------------------------------------------------------------------------------ 
+     * this.state はclass内で大きな意味を持つ。
+     * 通常、html上での変化でclass内の値を変更できないが、ここに定義した変数は自由に変更できる。
+     * --------------------------------------------------------------------------------------------------------- */
     this.state = {
       count : JSON.parse(localStorage.getItem("userTrainingData"))[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType],
       buttonText : "中断する"
     }
+
     this.flag = false
   }
 
+  /** conmonentDidMount --------------------------------------------------------------------------
+   * 関数での useEffect(() => {}) と同じ意味をもつ。
+   * つまりは、クラスが生成された時に1回だけ実行される。
+   * ここではカメラを起動し、起動中ずっと行われる処理を定義している。
+   * ------------------------------------------------------------------------------------------- */
   async componentDidMount() {
 
+    // video Element
     const video = this.videoRef.current;
+    // canvas Element
     const canvas = this.canvasRef.current;
 
+    /**calculateAngleWithin180 --------------------------------------------------------------------------
+     * webカメラから得た座標情報を基に角度を計算する関数。
+    --------------------------------------------------------------------------------------------------*/
     const calculateAngleWithin180 = (Ax, Ay, Bx, By, Cx, Cy) => {
       const angleAB = Math.atan2(Ay - By, Ax - Bx);
       const angleBC = Math.atan2(Cy - By, Cx - Bx);
@@ -42,7 +71,13 @@ class PoseDetection extends Component {
       }
       return angle;
     }
+    
 
+    /**muscle_counter ------------------------------------------------------------------------------------
+     * localStorageに保存したカウントを上昇させる。
+     * keypointsには各部位の座標データが保存されている。
+     * また、whichの値によって筋トレの種類が決定される。
+     --------------------------------------------------------------------------------------------------- */
     const muscle_counter = (goal_count, which, keypoints) => {
       
       let angle = null;
@@ -172,83 +207,23 @@ class PoseDetection extends Component {
           console.log("count", countRef+1)
         }
       }
-
-
-
-      // 必要なジョイントの座標を取得＆格納
-  
-      // if (which === "PectoralTraining") {
-      //   angle = calculateAngleWithin180(
-      //     keypoints.keypoints[6].x, keypoints.keypoints[6].y,
-      //     keypoints.keypoints[8].x, keypoints.keypoints[8].y,
-      //     keypoints.keypoints[10].x, keypoints.keypoints[10].y,
-      //   );
-
-      //   average_score = (
-      //     keypoints.keypoints[6].score + 
-      //     keypoints.keypoints[8].score +
-      //     keypoints.keypoints[10].score
-      //   ) / 3
-      // } else if (which === "AbsTraining") {
-      //   angle = calculateAngleWithin180(
-      //     keypoints.keypoints[6].x, keypoints.keypoints[6].y,
-      //     keypoints.keypoints[12].x, keypoints.keypoints[12].y,
-      //     keypoints.keypoints[14].x, keypoints.keypoints[14].y,
-      //   );
-
-      //   average_score = (
-      //     keypoints.keypoints[6].score + 
-      //     keypoints.keypoints[12].score +
-      //     keypoints.keypoints[14].score
-      //   ) / 3
-
-      // } else if (which === "LegTraining") {
-      //   angle = calculateAngleWithin180(
-      //     keypoints.keypoints[12].x, keypoints.keypoints[12].y,
-      //     keypoints.keypoints[14].x, keypoints.keypoints[14].y,
-      //     keypoints.keypoints[16].x, keypoints.keypoints[16].y,
-      //   );
-      //   average_score = (
-      //     keypoints.keypoints[12].score + 
-      //     keypoints.keypoints[14].score +
-      //     keypoints.keypoints[16].score
-      //   ) / 3
-      // }
-
-
-      // if (this.flag === false && angle > 130 && average_score > 0.6){
-      //   this.flag = true
-      // }else if (this.flag === true && angle < 60 && average_score > 0.6){
-      //   localStorage.setItem("count", countRef+1);
-      //   this.flag = false
-      //   console.log("count", countRef+1)
-      // }
-
-      // // カウンターを開始するための条件
-      // if (!counting && angle !== null && angle > 100) {
-      //   counting = true;
-      //   console.log("Counting", counting)
-      // }
-      // // カウント条件
-      // if (counting && angle !== null && angle < 90) {
-      //   console.log("Flag", flag)
-      //   flag = 1;
-      // }
-      // // セットの位置に戻したらカウント
-      // if (this.counting && angle !== null && angle > 100 && flag === 1) {
-      //   this.count++;
-      //   console.log("Count", this.count)
-      //   flag = 0; // カウント条件をリセット
-      // }
     }
   
 
+    /**createDetector ----------------------------------------------------------------------------------
+     * 姿勢検出器を生成する。
+     * ここでは TensorFlow の movenet を利用している。
+    -------------------------------------------------------------------------------------------------- */
     const createDetector  = async () => {
       const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING};
       const detector = await poseDetection.createDetector(this.model, detectorConfig);
       return detector
     }
 
+    /** setupCamera ------------------------------------------------------------------------------------
+     * stream で camera で取得する情報を指定して生成。
+     * 正直よくわかっていないが、ここを弄る必要は感じない。
+    -------------------------------------------------------------------------------------------------- */
     const setupCamera = async () => {
       const stream = await navigator.mediaDevices.getUserMedia({ 'audio': false, 'video': true });
       const video = this.videoRef.current;
@@ -261,43 +236,75 @@ class PoseDetection extends Component {
       });
     };
 
+    // tensorFlowを利用するためのセットアップ ------------------------------------------- //
     tf.setBackend('webgpu');
     await tf.ready();
 
-    const detector = createDetector();
-    const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
-    const Today = dayjs().format("YYYY/MM/DD")
-    localStorage.setItem("count", this.state.count)
+    const detector = createDetector(); // 検出器
+    const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData")) // トレーニング情報
+    const Today = dayjs().format("YYYY/MM/DD") // 今日の日付
+    localStorage.setItem("count", this.state.count) // 何回筋トレしたかの情報
+    
+
+    /** detectPose --------------------------------------------------------- 
+     * カメラの情報を基に姿勢を検知する関数。
+     * video に現在映っている情報、canvas にはcanvasElementが入っている。
+     * 姿勢検知した座標の点を canvas に描き、video と重ねる事で表示が実現されている。
+     * ----------------------------------------------------------------------- */
     const detectPose = async (video, canvas, detector) =>  {
 
+      // canvasに書き込むためのelement
       const ctx = canvas.getContext('2d');
       
+      // videoセットアップ
       const videoElement = await setupCamera();
-
       video.play();
 
+      /**detect ---------------------------------------------------------------------
+       * 姿勢を検出し、poses 変数に格納する。
+       * drawImage, drawKeypoints, drawSkeleton はそれぞれ下で定義されている。
+       * 意味は、video と canvas の座標を重ねる, keypoint を描写する , 座標を繋ぐ線を描写する。
+      -----------------------------------------------------------------------------------  */
       const detect = async (video, ctx, detector) => {
         const poses = await (await detector).estimatePoses(video);
         ctx.clearRect(0, 0, this.width, this.height);
-
+        
+        // 座標データを描写 ------------------------------------------------------------------
         if (poses.length !== 0){
           drawImage(video, ctx)
           drawKeypoints(poses[0], ctx)
           drawSkeleton(poses[0], ctx)
+
+          // 座標データを基に筋トレできているかを判定 & カウント ----------------------------------------------
           muscle_counter(userTrainingData[Today]["target"][this.trainingType], this.trainingType, poses[0])
         }
+
+        /* ---------------------------------------------------------------------------------
+        * 実質的な while 文である
+        * カメラに新しく情報が追加されると、detect 関数が実行される
+        ------------------------------------------------------------------------------------ */
         requestAnimationFrame(() => detect(video, ctx, detector));
       }
 
+      /* detect関数終わり --------------------------------------------------------------------------------- */
+
+      // detectPose関数の中で detect関数が実行されている。
+      // つまり、detectPoseが実行されないと、姿勢検出とポイント描写は行われない。
       detect(videoElement, ctx, detector);
       
     }
 
+    /** detectPose終わり ----------------------------------------------------------------------------------- */
+
+    // 座標を指定して、video と重ねてcanvasを表示させる
     const drawImage = (video, ctx) => {
       ctx.drawImage(video, 0, 0, this.width, this.height);
     }
 
+    // keypoint の点を canvas に書き込む関数
     const drawKeypoints = (keypoints, ctx) => {
+
+      // keypointがそれぞれ何番なのかを取得
       const keypointInd = poseDetection.util.getKeypointIndexBySide(this.model);
 
       ctx.fillStyle = 'Red';
@@ -307,6 +314,7 @@ class PoseDetection extends Component {
       const scaleFactorX = this.width / 640;
       const scaleFactorY = this.height / 480;
 
+      // 右側なら orange , 左側なら green, それ以外なら red に染める
       for (var i=0; i<keypoints.keypoints.length; i++){
 
         if (keypointInd.right.includes(i)){
@@ -316,7 +324,8 @@ class PoseDetection extends Component {
         }else{
           ctx.fillStyle = "Red";
         }
-
+        
+        // 信頼スコアが 0.3 以上の時のみ描写 ------------------------------------------
         if (keypoints.keypoints[i].score >= 0.3) {
           const circle = new Path2D();
           circle.arc(
@@ -328,6 +337,7 @@ class PoseDetection extends Component {
       }
     }
 
+    // keypoint の点と点を繋ぐ線を描写 --------------------------------------------------------
     const drawSkeleton = (keypoints, ctx) => {
       const color = "Green";
       ctx.fillStyle = color;
@@ -336,7 +346,8 @@ class PoseDetection extends Component {
 
       const scaleFactorX = canvas.width / 640;
       const scaleFactorY = canvas.height / 480;
-
+      
+      // keypoint の pair を取得、このペアを線でつなぐ。
       poseDetection.util.getAdjacentPairs(this.model).forEach(([i,j]) => {
         const kp1 = keypoints.keypoints[i];
         const kp2 = keypoints.keypoints[j];
@@ -346,6 +357,7 @@ class PoseDetection extends Component {
         const score2 = kp2.score != null ? kp2.score : 1;
         const scoreThreshold = 0.3;
 
+        // 描写 --------------------------------------------------------
         if (score1 >= scoreThreshold && score2 >= scoreThreshold) {
           ctx.beginPath();
           ctx.moveTo(scaleFactorX * kp1.x, scaleFactorY * kp1.y);
@@ -354,204 +366,15 @@ class PoseDetection extends Component {
         }
       });
     }
-
+  
+  // ここでdetectPoseが実行される。 -------------------------------------------
   detectPose(video, canvas, detector)
   
-
   }
 
-  // async componentDidUpdate() {
 
-  //   const video = this.videoRef.current;
-  //   const canvas = this.canvasRef.current;
-
-  //   const calculateAngleWithin180 = (Ax, Ay, Bx, By, Cx, Cy) => {
-  //     const angleAB = Math.atan2(Ay - By, Ax - Bx);
-  //     const angleBC = Math.atan2(Cy - By, Cx - Bx);
-  //     let angle = Math.abs(Math.round((angleBC - angleAB) * 180 / Math.PI));
-
-  //     if (angle > 180) {
-  //       angle = 360 - angle;
-  //     }
-  //     return angle;
-  //   }
-
-  //   const muscle_counter = (goal_count, which, keypoints) => {
-  //     let angle = null;
-  //     // 必要なジョイントの座標を取得＆格納
-  
-  //     if (which === "胸筋") {
-  //       angle = calculateAngleWithin180(
-  //         keypoints.keypoints[6].x, keypoints.keypoints[6].y,
-  //         keypoints.keypoints[8].x, keypoints.keypoints[8].y,
-  //         keypoints.keypoints[10].x, keypoints.keypoints[10].y,
-  //       );
-  //     } else if (which === "腹筋") {
-  //       angle = calculateAngleWithin180(
-  //         keypoints.keypoints[6].x, keypoints.keypoints[6].y,
-  //         keypoints.keypoints[12].x, keypoints.keypoints[12].y,
-  //         keypoints.keypoints[14].x, keypoints.keypoints[14].y,
-  //       );
-  //     } else if (which === "足筋") {
-  //       angle = calculateAngleWithin180(
-  //         keypoints.keypoints[12].x, keypoints.keypoints[12].y,
-  //         keypoints.keypoints[14].x, keypoints.keypoints[14].y,
-  //         keypoints.keypoints[16].x, keypoints.keypoints[16].y,
-  //       );
-  //     }
-  
-  //     console.log(angle);
-  
-  //     // カウンターを開始するための条件
-  //     if (!this.counting && angle !== null && angle > 100) {
-  //       this.counting = true;
-  //       console.log("Counting", this.counting)
-  //     }
-  //     // カウント条件
-  //     if (this.counting && angle !== null && angle < 90) {
-  //       console.log("Flag", this.flag)
-  //       this.flag = 1;
-  //     }
-  //     // セットの位置に戻したらカウント
-  //     if (this.counting && angle !== null && angle > 100 && this.flag === 1) {
-  //       this.count++;
-  //       console.log("Count", this.count)
-  //       this.flag = 0; // カウント条件をリセット
-  //     }
-  //     // 目標の数に達した場合は処理を終了
-  //     if (this.count >= goal_count) {
-  //       this.result = true;
-  //       return this.result;
-  //     }
-  //   }
-  
-
-  //   const createDetector  = async () => {
-  //     const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING};
-  //     const detector = await poseDetection.createDetector(this.model, detectorConfig);
-  //     return detector
-  //   }
-
-  //   const setupCamera = async () => {
-  //     const stream = await navigator.mediaDevices.getUserMedia({ 'audio': false, 'video': true });
-  //     const video = this.videoRef.current;
-  //     video.srcObject = stream;
-
-  //     return new Promise((resolve) => {
-  //       video.onloadedmetadata = () => {
-  //         resolve(video);
-  //       };
-  //     });
-  //   };
-
-  //   tf.setBackend('webgpu');
-  //   await tf.ready();
-
-  //   const detector = createDetector();
-  //   const detectPose = async (video, canvas, detector) =>  {
-
-  //     const ctx = canvas.getContext('2d');
-      
-  //     const videoElement = await setupCamera();
-
-  //     video.play();
-
-  //     const detect = async (video, ctx, detector) => {
-  //       const poses = await (await detector).estimatePoses(video);
-  //       ctx.clearRect(0, 0, this.width, this.height);
-  //       // await ctx.translate(900, 0);
-  //       // await ctx.scale(-1, 1);
-
-  //       if (poses.length !== 0){
-  //         drawImage(video, ctx)
-  //         drawKeypoints(poses[0], ctx)
-  //         drawSkeleton(poses[0], ctx)
-  //         muscle_counter(this.count, this.trainingType, poses[0])
-  //       }
-  //       requestAnimationFrame(() => detect(video, ctx, detector));
-  //     }
-
-  //     detect(videoElement, ctx, detector);
-      
-  //   }
-
-  //   const drawImage = (video, ctx) => {
-  //     ctx.drawImage(video, 0, 0, this.width, this.height);
-  //   }
-
-  //   const drawKeypoints = (keypoints, ctx) => {
-  //     const keypointInd = poseDetection.util.getKeypointIndexBySide(this.model);
-
-  //     ctx.fillStyle = 'Red';
-  //     ctx.strokeStyle = 'white';
-  //     ctx.lineWidth = 2;
-
-  //     const scaleFactorX = this.width / 640;
-  //     const scaleFactorY = this.height / 480;
-
-  //     for (var i=0; i<keypoints.keypoints.length; i++){
-
-  //       if (keypointInd.right.includes(i)){
-  //         ctx.fillStyle = 'Orange';
-  //       }else if (keypointInd.left.includes(i)){
-  //         ctx.fillStyle = "Green";
-  //       }else{
-  //         ctx.fillStyle = "Red";
-  //       }
-
-  //       if (keypoints.keypoints[i].score >= 0.3) {
-  //         const circle = new Path2D();
-  //         circle.arc(
-  //           scaleFactorX * keypoints.keypoints[i].x, 
-  //           scaleFactorY * keypoints.keypoints[i].y, 5, 0, 2 * Math.PI);
-  //         ctx.fill(circle);
-  //         ctx.stroke(circle);
-  //       }
-  //     }
-  //   }
-
-  //   const drawSkeleton = (keypoints, ctx) => {
-  //     const color = "Green";
-  //     ctx.fillStyle = color;
-  //     ctx.strokeStyle = color;
-  //     ctx.lineWidth = 4;
-
-  //     const scaleFactorX = canvas.width / 640;
-  //     const scaleFactorY = canvas.height / 480;
-
-  //     poseDetection.util.getAdjacentPairs(this.model).forEach(([i,j]) => {
-  //       const kp1 = keypoints.keypoints[i];
-  //       const kp2 = keypoints.keypoints[j];
-
-  //       // If score is null, just show the keypoint.
-  //       const score1 = kp1.score != null ? kp1.score : 1;
-  //       const score2 = kp2.score != null ? kp2.score : 1;
-  //       const scoreThreshold = 0.3;
-
-  //       if (score1 >= scoreThreshold && score2 >= scoreThreshold) {
-  //         ctx.beginPath();
-  //         ctx.moveTo(scaleFactorX * kp1.x, scaleFactorY * kp1.y);
-  //         ctx.lineTo(scaleFactorX * kp2.x, scaleFactorY * kp2.y);
-  //         ctx.stroke();
-  //       }
-  //     });
-  //   }
-
-  // detectPose(video, canvas, detector)
-  
-
-  // }
-
+  /* HTMLを返す -------------------------------------------------------------------------------- */
   render() {
-    // const {userTrainingData } = this.context
-    // console.log(userTrainingData, "レンダー前 userTrainingData")
-
-    // if (userTrainingData === {} || userTrainingData.length === 0) {
-    //   return (<></>)
-    // }else{
-    //   console.log(userTrainingData, "{}じゃないときの処理")
-    // }
-
     let userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
     let userId = localStorage.getItem("UserId")
 

@@ -1,6 +1,8 @@
 import React, {useState, useRef } from 'react'
-import { db } from '../App';
+import { db, app } from '../App';
 import { where, collection, getDocs, query, setDoc, doc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword, signOut,
+    createUserWithEmailAndPassword, onAuthStateChanged, } from "firebase/auth"
 
 function Login() {
 
@@ -75,10 +77,54 @@ function Login() {
         }
     }
 
+    /**Email認証 ------------------------------------------------------------
+     * Emailとpasswordでログインが出来るようにする。
+     * Firebaseで動かす。
+     ---------------------------------------------------------------------- */
+    const emailAuth = async () => {
+        const auth = getAuth(app);
+
+        
+
+    }
+
     return (
     <div className='Form'><div className='wrap'>
+        <form>
+            <div>
+                <label for="inputEmail">E-mail</label>
+                <input type="email" name="inputEmail" id="inputEmail"></input>
+            </div>
+            <div>
+                <label for="inputPassword">Password</label>
+                <input type="password" name="inputPassword" id="inputPassword"></input>
+            </div>
+            <button type="submit" id="buttonSignin" aria-describedby="errorMessage">Sign in</button>
+            <p> or </p>
+            <button type="button" id="buttonSignup" aria-describedby="errorMessage">Sign up</button>
+            <p id="errorMessage"></p>
+        </form>
+{/* 
+        <h1>How to sign in with email and password using Firebase Auth</h1>
+        <section id="sectionSignin">
+            <h2>Sign in / Sign up</h2>
+            <form>
+                <button type="submit" id="buttonSignin">Sign in</button>
+            </form>
+        </section>
+        <section id="sectionUser">
+            <h2>User information</h2>
+            <dl>
+                <dt>uid</dt>
+                <dd id="uid"></dd>
+            </dl>
+        </section>
+        <section id="sectionSignout">
+            <h2>Sign out</h2>
+            <button type="button" id="buttonSignout">Sign out</button>
+        </section> */}
 
-        <h2>{Title}</h2>
+        {/* <h2>{Title}</h2>
 
         <label className='InputLabel'>ユーザーID : </label>
         <input type='text' className='LoginUser' id='UserId' 
@@ -98,7 +144,7 @@ function Login() {
             <div className='GuideButton'>
             <div onClick={LoginCheck} className='LoginButton'>ログイン</div>
             <div onClick={classToggle} className='LRToggle'>ユーザー登録はこちら</div></div>
-        </div>
+        </div> */}
         
         {/* ユーザー登録用フォーム追加 */}
         <div id={active ? "active" : ""} className='SignIn'>
