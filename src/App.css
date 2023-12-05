@@ -1,3 +1,47 @@
+/* 友人FB
+・ボタンの角を丸める　⇒　四角よりは丸の方が良い。
+・色味赤より　⇒　脂肪を燃やすのイメージ
+・「トレーニングを始めよう」を目立たせる　⇒　下文章の改行 or 強調 or 文字数削減
+・選択画面の左右の余白を小さく、上下の余白を大きく　⇒　空間に余白を持たせる。
+*/
+
+#loading {
+  width: 100vw;
+  height: 100vh;
+  transition: all 1s;
+  background-color: #17bfaf;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+.spinner {
+  width: 100px;
+  height: 100px;
+  margin: 200px auto;
+  background-color: #fff;
+  border-radius: 100%;
+  animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+/* Loading Animation */
+@keyframes sk-scaleout {
+  0% {
+      transform: scale(0);
+  } 100% {
+      transform: scale(1.0);
+      opacity: 0;
+  }
+}
+
+/* Hide Loading Block */
+.loaded {
+  opacity: 0;
+  visibility: hidden;
+}
+
+
+
+
 .header {
   display: none;
   padding: 10px;

@@ -1,16 +1,21 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import dayjs from "dayjs";
 import GlobalContext from "../../context/GlobalContext";
 
 export const Day = (props) => {
-  const { day } = props;
+  const { day, userTrainingData } = props;
   // const [dayEvents, setDayEvents] = useState([]);
-  const { setDaySelected, setShowEventModal, monthIndex } =
-    useContext(GlobalContext);
-
-  const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
+  const { setDaySelected, setShowEventModal, monthIndex } = useContext(GlobalContext);
+  // const [todayData, setTodayData] = useState("");
 
   const todayStringElement = dayjs().format("YYYY/MM/DD").toString()
+
+  // console.log(userTrainingData, day)
+  // useEffect(() => {
+  //   if (userTrainingData != {}) {
+  //     console.log(userTrainingData)
+  //   }
+  // },[userTrainingData])
 
   // 今日の日付を色付けする
   const getCurrentDayClass = () => {
@@ -21,14 +26,16 @@ export const Day = (props) => {
 
   const NoticeElement = (day) => {
     const dayStringElement = dayjs(day).format("YYYY/MM/DD").toString();
-    const todayUserData = userTrainingData[dayStringElement];
+    const todayData = userTrainingData[dayStringElement];
     var i = 0;
+    
+    // console.log(todayData)
 
-    if (todayUserData === undefined && todayStringElement > dayStringElement){
+    if (todayData === undefined && todayStringElement > dayStringElement){
       return (<p> / </p>)
     }
 
-    if (todayUserData === undefined && todayStringElement < dayStringElement) {
+    if (todayData === undefined && todayStringElement < dayStringElement) {
       return (<p>  </p>)
     }
 
@@ -36,7 +43,7 @@ export const Day = (props) => {
       let userDataKeys = ["AbsTraining", "LegTraining", "PectoralTraining"]
       let cnt = 0;
       for (i=0; i < userDataKeys.length; i++){
-        if (todayUserData["target"][userDataKeys[i]] > todayUserData["training"][userDataKeys[i]]){
+        if (todayData["target"][userDataKeys[i]] > todayData["training"][userDataKeys[i]]){
           cnt++;
         }
       }
@@ -50,7 +57,7 @@ export const Day = (props) => {
       let userDataKeys = ["AbsTraining", "LegTraining", "PectoralTraining"]
       let cnt = 0;
       for (i=0; i < userDataKeys.length; i++){
-        if (todayUserData["target"][userDataKeys[i]] > todayUserData["training"][userDataKeys[i]]){
+        if (todayData["target"][userDataKeys[i]] > todayData["training"][userDataKeys[i]]){
           cnt++;
         }
       }
@@ -70,6 +77,11 @@ export const Day = (props) => {
       return (<p></p>)
     }
 
+  }
+
+  // console.log(userTrainingData, todayData)
+  if (userTrainingData == {}){
+    return (<></>)
   }
 
   // 登録データを日付が一致する日に表示

@@ -33,9 +33,9 @@ ChartJS.register(
  * - 累計積み上げグラフ
  */
 
-function Graph() {
+function Graph(props) {
 
-    const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"));
+    const { userTrainingData } = props;
 
     const BarOptions = {
         plugins: {

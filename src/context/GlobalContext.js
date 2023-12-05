@@ -17,6 +17,8 @@ const GlobalContext = React.createContext({
   setTrainingType : () => {},
   trainingCount : 0,
   setTrainingCount : () => {},
+  userId : "",
+  setUserId : () => {},
 });
 
 export default GlobalContext;

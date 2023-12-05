@@ -29,6 +29,7 @@ const ContextWrapper = (props) => {
   const [userTrainingData, setUserTrainingData] = useState({});
   const [trainingType, setTrainingType] = useState("");
   const [trainingCount, setTrainingCount] = useState(0);
+  const [userId, setUserId] = useState("");
   
   const [savedEvents, dispatchCalEvent] = useReducer(
     saveEventsReducer,
@@ -67,6 +68,8 @@ const ContextWrapper = (props) => {
         setTrainingType,
         trainingCount,
         setTrainingCount,
+        userId,
+        setUserId,
       }}
     >
       {props.children}

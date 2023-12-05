@@ -1,21 +1,27 @@
 import React, {useState, useRef } from 'react'
-import { db, auth } from '../App';
+import { db, auth } from '../index';
 import { where, collection, getDocs, query, setDoc, doc } from "firebase/firestore";
-import { getAuth, signInWithEmailAndPassword, signOut,
-    createUserWithEmailAndPassword, onAuthStateChanged, } from "firebase/auth"
+import { signInWithEmailAndPassword,
+    createUserWithEmailAndPassword, } from "firebase/auth";
+
+import dayjs from "dayjs";
 
 function Login() {
 
     // const userList = 
     const [active, setActive] = useState(false);
-    const [UserId, setUserId] = useState("");
+    // const [UserId, setUserId] = useState("");
     const [password, setPassword] = useState("");
     const [SecondPassword, setSecondPassword] = useState("");
     const [Title, setTitle] = useState("ログイン");
+    const [Email, setEmail] = useState("");
+    // const [AuthPassword, setAuthPassword] = useState("");
 
     const genderRef = useRef(null);
     const trainingRef = useRef(null);
     const targetRef = useRef(null);
+    // const EmailRef = useRef(null);
+    
 
     const classToggle = () => {
         setActive(!active);
@@ -27,116 +33,106 @@ function Login() {
         
     }
 
-    const LoginCheck = async () => {
-        const querySnapshot = await getDocs(query(collection(db, "User"), where("UserId","==",UserId),where("password","==",password)));
-
-        if (querySnapshot.docs.length === 1){
-            localStorage.setItem("Login", "yes");
-            localStorage.setItem("UserId", UserId);
-            window.location.pathname = "/";
-        }else{
-            alert("ユーザーIDかパスワードが間違っています。");
-        }
-    }
-
-    const RegistCheck = async () => {
-        const querySnapshot = await getDocs(query(collection(db, "User"), where("UserId","==",UserId)));
-
-        if (querySnapshot.docs.length === 0 && password === SecondPassword) {
-            await setDoc(doc(db, "User", UserId), {
-                "UserId" : UserId,
-                "password" : password
-            });
-            localStorage.setItem("Login", "yes");
-            localStorage.setItem("UserId", UserId);
-
-            let base = 0;
-            let goals = {
-                "筋肉量UP" : 30,
-                "ダイエット" : 20,
-                "健康維持" : 10
-            }
-            let frecency = {
-                "0" : 10,
-                "1" : 5,
-                "2" : 0
-            }
-            if (genderRef.current.value === "男"){
-                base += 10
-            }
-            base += goals[targetRef.current.value]
-            base += frecency[trainingRef.current.value]
-
-            localStorage.setItem("base", base)
-
-            window.location.pathname = "/"
-        }else if (password !== SecondPassword){
-            alert("パスワードが一致しません");
-        }else {
-            alert("そのユーザーIDは利用できません。別のものを登録してください。")
-        }
-    }
-
     /**Email認証 ------------------------------------------------------------
      * Emailとpasswordでログインが出来るようにする。
      * Firebaseで動かす。
      ---------------------------------------------------------------------- */
-    const signUp = async (event) => {
-        try {
-            event.preventDefault()
-      
-            // const email = 
-            const password = el.inputPassword.value
-            await createUserWithEmailAndPassword(auth, email, password)
-          } catch (err) {
-            el.errorMessage.innerHTML = err.message
-            console.error(err)
-          }
+    const signUp = async () => {
+
+        if (password !== SecondPassword) {
+            alert("invalid password")
+            return 0;
+        }
+
+        let base = 0;
+        let goals = {
+            "筋肉量UP" : 30,
+            "ダイエット" : 20,
+            "健康維持" : 10
+        }
+        let frecency = {
+            "0" : 10,
+            "1" : 5,
+            "2" : 0
+        }
+        if (genderRef.current.value === "男"){
+            base += 10
+        }
+        base += goals[targetRef.current.value]
+        base += frecency[trainingRef.current.value]
+
+        createUserWithEmailAndPassword(auth, Email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            const uid = user.uid;
+            const today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
+
+            /**Userが既に存在するか判定 ------------------------------------------------- */
+            getDocs(query(collection(db, "User"), where("UserId","==",uid)))
+            .then(result => {
+                if (result.docs.length === 0) {
+                    setDoc(doc(db, "TrainingData", uid), {
+                        TrainingData : {
+                            [today] : {
+                                target : {
+                                    AbsTraining : base,
+                                    LegTraining : base,
+                                    PectoralTraining : base,
+                                },
+                                training : {
+                                    AbsTraining : 0,
+                                    LegTraining : 0,
+                                    PectoralTraining : 0,
+                                },
+                                totalTime : {
+                                    AbsTraining : 0,
+                                    LegTraining : 0,
+                                    PectoralTraining : 0
+                                }
+                            }
+                        },
+                    })
+                }else{
+                    alert("input other uid or pass.")
+                }
+            })
+            
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorMessage)
+            console.log(errorCode,errorMessage)
+        })
+    }
+
+    const signIn = async () => {
+        signInWithEmailAndPassword(auth, Email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            console.log(user.uid);
+            console.log(auth.currentUser)
+            // window.location.pathname = "/calender/"
+            // alert("Login!")
+            
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorCode,errorMessage)
+            console.log(errorCode,errorMessage)
+        })
     }
 
     return (
     <div className='Form'><div className='wrap'>
-        <form>
-            <div>
-                <label htmlFor="inputEmail">E-mail</label>
-                <input type="email" name="inputEmail" id="inputEmail"></input>
-            </div>
-            <div>
-                <label htmlFor="inputPassword">Password</label>
-                <input type="password" name="inputPassword" id="inputPassword"></input>
-            </div>
-            <button type="submit" id="buttonSignin" aria-describedby="errorMessage" onClick={signIn}>Sign in</button>
-            <p> or </p>
-            <button type="button" id="buttonSignup" aria-describedby="errorMessage" onClick={signUp(this
-                )}>Sign up</button>
-            <p id="errorMessage"></p>
-        </form>
-{/* 
-        <h1>How to sign in with email and password using Firebase Auth</h1>
-        <section id="sectionSignin">
-            <h2>Sign in / Sign up</h2>
-            <form>
-                <button type="submit" id="buttonSignin">Sign in</button>
-            </form>
-        </section>
-        <section id="sectionUser">
-            <h2>User information</h2>
-            <dl>
-                <dt>uid</dt>
-                <dd id="uid"></dd>
-            </dl>
-        </section>
-        <section id="sectionSignout">
-            <h2>Sign out</h2>
-            <button type="button" id="buttonSignout">Sign out</button>
-        </section> */}
 
-        {/* <h2>{Title}</h2>
+        <h2>{Title}</h2>
 
-        <label className='InputLabel'>ユーザーID : </label>
+        <label className='InputLabel' >メールアドレス : </label>
         <input type='text' className='LoginUser' id='UserId' 
-            value={UserId}
-            onChange={(event) => setUserId(event.target.value)} required>
+            value={Email}
+            onChange={(event) => setEmail(event.target.value)} required>
         </input>
 
         <br></br>
@@ -147,11 +143,13 @@ function Login() {
             onChange={(event) => setPassword(event.target.value)} required>
         </input>
 
+
+
         <div id={active ? "" : "active"} className='SignIn'>
             <div className='GuideButton'>
-            <div onClick={LoginCheck} className='LoginButton'>ログイン</div>
+            <div onClick={signIn} className='LoginButton'>ログイン</div>
             <div onClick={classToggle} className='LRToggle'>ユーザー登録はこちら</div></div>
-        </div> */}
+        </div>
         
         {/* ユーザー登録用フォーム追加 */}
         <div id={active ? "active" : ""} className='SignIn'>
@@ -183,7 +181,7 @@ function Login() {
             </select>
 
             <div className='GuideButton'>
-                <div className='LoginButton' onClick={RegistCheck}> ユーザー登録</div>
+                <div className='LoginButton' onClick={signUp}> ユーザー登録</div>
                 <div onClick={classToggle} className='LRToggle'>ログインはこちら</div>
             </div>
         </div>
@@ -193,3 +191,56 @@ function Login() {
 
 
 export default Login
+
+
+
+
+    // const LoginCheck = async () => {
+    //     const querySnapshot = await getDocs(query(collection(db, "User"), where("UserId","==",UserId),where("password","==",password)));
+
+    //     if (querySnapshot.docs.length === 1){
+    //         localStorage.setItem("Login", "yes");
+    //         localStorage.setItem("UserId", UserId);
+    //         window.location.pathname = "/";
+    //     }else{
+    //         alert("ユーザーIDかパスワードが間違っています。");
+    //     }
+    // }
+
+    // const RegistCheck = async () => {
+    //     const querySnapshot = await getDocs(query(collection(db, "User"), where("UserId","==",UserId)));
+
+    //     if (querySnapshot.docs.length === 0 && password === SecondPassword) {
+    //         await setDoc(doc(db, "User", UserId), {
+    //             "UserId" : UserId,
+    //             "password" : password
+    //         });
+    //         localStorage.setItem("Login", "yes");
+    //         localStorage.setItem("UserId", UserId);
+
+    //         let base = 0;
+    //         let goals = {
+    //             "筋肉量UP" : 30,
+    //             "ダイエット" : 20,
+    //             "健康維持" : 10
+    //         }
+    //         let frecency = {
+    //             "0" : 10,
+    //             "1" : 5,
+    //             "2" : 0
+    //         }
+    //         if (genderRef.current.value === "男"){
+    //             base += 10
+    //         }
+    //         base += goals[targetRef.current.value]
+    //         base += frecency[trainingRef.current.value]
+
+    //         localStorage.setItem("base", base)
+
+    //         window.location.pathname = "/"
+    //     }else if (password !== SecondPassword){
+    //         alert("パスワードが一致しません");
+    //     }else {
+    //         alert("そのユーザーIDは利用できません。別のものを登録してください。")
+    //     }
+    // }

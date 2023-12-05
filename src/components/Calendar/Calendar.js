@@ -6,10 +6,11 @@ import GlobalContext from "../../context/GlobalContext";
 import { EventModal } from "./EventModal";
 // import { getUserTrainingData } from '../Home/TrainingMenu';
 
-function Calendar() {
+function Calendar(props) {
 
   const [currentMonth, setCurrentMonth] = useState(getMonth());
   const { monthIndex, showEventModal } = useContext(GlobalContext);
+  const {userTrainingData} = props
 
   // console.log(userTrainingData)
 
@@ -24,7 +25,7 @@ function Calendar() {
       <div className="h-screen flex flex-col CalendarArea">
         <CalendarHeader />
         <div className="flex flex-1">
-          <Month month={currentMonth} />
+          <Month month={currentMonth} userTrainingData={userTrainingData} />
         </div>
       </div>
     </div>

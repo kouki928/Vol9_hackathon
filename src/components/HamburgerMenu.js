@@ -1,6 +1,9 @@
-import React, {useState} from 'react'
-import { HamburgerMenuData } from './SidebarData'
+import React, {useState} from 'react';
+import { HamburgerMenuData } from './SidebarData';
 import Sidebar from './Sidebar';
+
+import { auth } from "../index";
+import { signOut } from 'firebase/auth';
 
 function HamburgerMenu() {
 
@@ -12,8 +15,12 @@ function HamburgerMenu() {
     }
 
     const logOut = () => {
-        localStorage.setItem("Login", "no");
-        window.location.reload();
+        signOut(auth).then(() => {
+            // Sign-out successful.
+        }).catch((error) => {
+            // An error happened.
+        });
+        window.location.reload()
     }
 
   return (
