@@ -2,22 +2,22 @@
  * 以下のような形式で取得する。
  * import { 関数 or 変数名 } from "url"
  * また、別の場所でも使いたい場合は export を変数や関数の前に付ける
- ------------------------------------------------------------------ */
+------------------------------------------------------------------ */
 import React, { Component, useContext } from 'react';
 import GlobalContext from '../../context/GlobalContext';
 import dayjs from 'dayjs';
 import { collection, doc, setDoc } from 'firebase/firestore';
-import { db } from '../../App';
+import { db } from '../../index';
 
 import { Camera } from "@mediapipe/camera_utils";
 import { drawConnectors, drawLandmarks, clamp } from "@mediapipe/drawing_utils";
 import { Pose, POSE_CONNECTIONS, POSE_LANDMARKS_LEFT, POSE_LANDMARKS_NEUTRAL, POSE_LANDMARKS_RIGHT } from "@mediapipe/pose/pose";
 
 /** PoseDetection ----------------------------------------------------------
- * Componentクラスを継承したクラス。クラスである意味は特になく、検索結果の産物
- * React内で変数のデータを共有するには useContext, useState という機能が使われるが、
- * Class内では両方使用できないため注意。代わりに、 static ... で定義している。
- -------------------------------------------------------------------------- */
+* Componentクラスを継承したクラス。クラスである意味は特になく、検索結果の産物
+* React内で変数のデータを共有するには useContext, useState という機能が使われるが、
+* Class内では両方使用できないため注意。代わりに、 static ... で定義している。
+-------------------------------------------------------------------------- */
 class PoseDetection extends Component {
 
   // ここでuseContextを使えるようにしている。
@@ -33,25 +33,26 @@ class PoseDetection extends Component {
     this.trainingType = new URL(decodeURI(window.location.href)).searchParams.get("classification");
 
     /** ------------------------------------------------------------------------------------------------------ 
-     * this.state はclass内で大きな意味を持つ。
-     * 通常、html上での変化でclass内の値を変更できないが、ここに定義した変数は自由に変更できる。
-     * --------------------------------------------------------------------------------------------------------- */
+    * this.state はclass内で大きな意味を持つ。
+    * 通常、html上での変化でclass内の値を変更できないが、ここに定義した変数は自由に変更できる。
+    * --------------------------------------------------------------------------------------------------------- */
     this.state = {
-      count: JSON.parse(localStorage.getItem("userTrainingData"))[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType],
-      buttonText: "中断する"
+      count: props.userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType],
+      buttonText: "中断する",
+      totalTime: props.userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"][this.trainingType]
     }
     this.frameCount = 0;
     this.angleList = [];
-    this.flag = false
+    this.flag = false;
     this.angle = 0;
-    this.timeCount = 0;
+    this.stopTimeCount = 0;
   }
 
   /** conmonentDidMount --------------------------------------------------------------------------
-   * 関数での useEffect(() => {}) と同じ意味をもつ。
-   * つまりは、クラスが生成された時に1回だけ実行される。
-   * ここではカメラを起動し、起動中ずっと行われる処理を定義している。
-   * ------------------------------------------------------------------------------------------- */
+  * 関数での useEffect(() => {}) と同じ意味をもつ。
+  * つまりは、クラスが生成された時に1回だけ実行される。
+  * ここではカメラを起動し、起動中ずっと行われる処理を定義している。
+  * ------------------------------------------------------------------------------------------- */
   async componentDidMount() {
 
     // video Element
@@ -60,10 +61,12 @@ class PoseDetection extends Component {
     const out5 = this.canvasRef.current;
     out5.style.transform = "scaleX(-1)";
     const canvasCtx5 = out5.getContext('2d');
+    const userTrainingData = this.props.userTrainingData
+    const Today = dayjs().format("YYYY/MM/DD") // 今日の日付
 
     /**calculateAngleWithin180 --------------------------------------------------------------------------
-    * webカメラから得た座標情報を基に角度を計算する関数。
-    --------------------------------------------------------------------------------------------------*/
+   * webカメラから得た座標情報を基に角度を計算する関数。
+   --------------------------------------------------------------------------------------------------*/
     const calculateAngleWithin180 = (Ax, Ay, Az, Bx, By, Bz, Cx, Cy, Cz) => {
       const vA = [Ax - Bx, Ay - By, Az - Bz];
       const vB = [Cx - Bx, Cy - By, Cz - Bz];
@@ -76,10 +79,10 @@ class PoseDetection extends Component {
     }
 
     /**muscle_counter ------------------------------------------------------------------------------------
-    * localStorageに保存したカウントを上昇させる。
-    * keypointsには各部位の座標データが保存されている。
-    * また、whichの値によって筋トレの種類が決定される。
-    --------------------------------------------------------------------------------------------------- */
+   * localStorageに保存したカウントを上昇させる。
+   * keypointsには各部位の座標データが保存されている。
+   * また、whichの値によって筋トレの種類が決定される。
+   --------------------------------------------------------------------------------------------------- */
     const muscle_counter = (goal_count, results) => {
 
       let which = new URL(decodeURI(window.location.href)).searchParams.get("classification");
@@ -87,10 +90,7 @@ class PoseDetection extends Component {
       let average_score = 0;
       let right_average_score = 0
       let left_average_score = 0
-      let countRef = parseInt(localStorage.getItem("count"))
-      this.setState({
-        count: countRef
-      })
+      console.log(this.state.count)
 
       if (this.state.count === goal_count) {
         canvasCtx5.scale(-1, 1);
@@ -104,7 +104,7 @@ class PoseDetection extends Component {
         return
       }
 
-      // 胸筋
+      // 腕立て伏せ
       if (which === "PectoralTraining") {
 
         right_average_score = (
@@ -147,11 +147,12 @@ class PoseDetection extends Component {
           this.angle = Math.round(this.angle);
           // 判定
           if (this.flag === false && this.angle > 120 && average_score > 0.6) {
-            this.flag = true
+            this.flag = true;
+            this.stopTimeCount = 0;
           } else if (this.flag === true && this.angle < 90 && average_score > 0.6) {
-            localStorage.setItem("count", countRef + 1);
-            this.flag = false
-            console.log("count", countRef + 1)
+            this.setState({ count: this.state.count + 1 })
+            this.flag = false;
+            this.stopTimeCount = 0;
           }
           // 初期化
           this.angleList = [];
@@ -200,18 +201,19 @@ class PoseDetection extends Component {
           this.angle = Math.round(this.angle);
           // 判定
           if (this.flag === false && this.angle > 130 && average_score > 0.6) {
-            this.flag = true
+            this.flag = true;
+            this.stopTimeCount = 0;
           } else if (this.flag === true && this.angle < 60 && average_score > 0.6) {
-            localStorage.setItem("count", countRef + 1);
-            this.flag = false
-            console.log("count", countRef + 1)
+            this.setState({ count: this.state.count + 1 })
+            this.flag = false;
+            this.stopTimeCount = 0;
           }
           // 初期化
           this.angleList = [];
           this.frameCount = 0;
         }
 
-        // 足筋
+        // スクワット
       } else if (which === "LegTraining") {
         right_average_score = (
           results.poseLandmarks[23].visibility +
@@ -253,21 +255,23 @@ class PoseDetection extends Component {
           this.angle = Math.round(this.angle);
           // 判定
           if (this.flag === false && this.angle > 150 && average_score > 0.6) {
-            this.flag = true
+            this.flag = true;
+            this.stopTimeCount = 0;
           } else if (this.flag === true && this.angle < 100 && average_score > 0.6) {
-            localStorage.setItem("count", countRef + 1);
-            this.flag = false
-            console.log("count", countRef + 1)
+            this.setState({ count: this.state.count + 1 })
+            this.flag = false;
+            this.stopTimeCount = 0;
           }
           // 初期化
           this.angleList = [];
           this.frameCount = 0;
         }
       }
+
       // 画像内に描画
+      canvasCtx5.scale(-1, 1);
       canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       canvasCtx5.font = "60px Arial"; // フォントサイズと種類
-      canvasCtx5.scale(-1, 1);
       canvasCtx5.fillText(`Angle: ${this.angle}°`, -630, 50); // 角度を描画
       if (this.flag === true) {
         canvasCtx5.fillStyle = "#0000FF"; // 青色のフォント
@@ -288,35 +292,40 @@ class PoseDetection extends Component {
       canvasCtx5.scale(-1, 1);
       canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
       canvasCtx5.font = "90px Arial"; // フォントサイズと種類
-      let timeString = this.timeCount.toString();
+      let timeString = this.state.totalTime.toString();
       if (timeString.length === 1) {
-        canvasCtx5.fillText(`${this.timeCount}`, -120, 470); // 経過時間を描画      
+        canvasCtx5.fillText(`${this.state.totalTime}`, -120, 470); // 経過時間を描画      
       } else if (timeString.length === 2) {
-        canvasCtx5.fillText(`${this.timeCount}`, -160, 470); // 経過時間を描画
+        canvasCtx5.fillText(`${this.state.totalTime}`, -160, 470); // 経過時間を描画
       } else if (timeString.length === 3) {
-        canvasCtx5.fillText(`${this.timeCount}`, -210, 470); // 経過時間を描画
+        canvasCtx5.fillText(`${this.state.totalTime}`, -210, 470); // 経過時間を描画
       } else if (timeString.length === 4) {
-        canvasCtx5.fillText(`${this.timeCount}`, -260, 470); // 経過時間を描画
+        canvasCtx5.fillText(`${this.state.totalTime}`, -260, 470); // 経過時間を描画
       }
       canvasCtx5.fillText(`s`, -50, 470); // 経過時間を描画
       canvasCtx5.scale(-1, 1);
+
+      // ストップ時間カウント
+      canvasCtx5.scale(-1, 1);
+      canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
+      canvasCtx5.font = "100px Arial"; // フォントサイズと種類
+      canvasCtx5.fillText(`${this.stopTimeCount}`, -480, 275); // 停止時間を描画
+      canvasCtx5.scale(-1, 1);
     }
 
-    const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData")) // トレーニング情報
-    const Today = dayjs().format("YYYY/MM/DD") // 今日の日付
-    localStorage.setItem("count", this.state.count) // 何回筋トレしたかの情報
-
     /** detectPose --------------------------------------------------------- 
-     * カメラの情報を基に姿勢を検知する関数。
-     * video に現在映っている情報、canvas にはcanvasElementが入っている。
-     * 姿勢検知した座標の点を canvas に描き、video と重ねる事で表示が実現されている。
-     * ----------------------------------------------------------------------- */
+    * カメラの情報を基に姿勢を検知する関数。
+    * video に現在映っている情報、canvas にはcanvasElementが入っている。
+    * 姿勢検知した座標の点を canvas に描き、video と重ねる事で表示が実現されている。
+    * ----------------------------------------------------------------------- */
     const detectPose = async () => {
-
       let timer;
       // ストップウォッチを開始する関数
       const startStopwatch = () => {
-        this.timeCount++;
+        this.stopTimeCount++;
+        if (this.stopTimeCount <= 5) {
+          this.state.totalTime++;
+        }
         timer = setTimeout(startStopwatch, 1000);
       };
 
@@ -408,13 +417,13 @@ class PoseDetection extends Component {
 
     // ここでdetectPoseが実行される。 -------------------------------------------
     detectPose()
-  }
 
+  }
 
   /* HTMLを返す -------------------------------------------------------------------------------- */
   render() {
-    let userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
-    let userId = localStorage.getItem("UserId")
+    const userTrainingData = this.props.userTrainingData
+    const userId = this.props.userId
 
     return (
       <div className='Main'>
@@ -437,7 +446,9 @@ class PoseDetection extends Component {
           <div className='TrainingButton' onClick={
             async () => {
               userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType] = this.state.count
-              localStorage.setItem("userTrainingData", JSON.stringify(userTrainingData))
+              userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"][this.trainingType] = this.state.totalTime
+
+              // localStorage.setItem("userTrainingData", JSON.stringify(userTrainingData))
               await setDoc(doc(collection(db, "TrainingData"), userId), { TrainingData: userTrainingData });
               window.location.href = "/"
             }
