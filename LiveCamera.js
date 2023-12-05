@@ -44,6 +44,7 @@ class PoseDetection extends Component {
     this.angleList = [];
     this.flag = false
     this.angle = 0;
+    this.timeCount = 0;
   }
 
   /** conmonentDidMount --------------------------------------------------------------------------
@@ -198,9 +199,9 @@ class PoseDetection extends Component {
           this.angle = sum / this.frameCount;
           this.angle = Math.round(this.angle);
           // 判定
-          if (this.flag === false && angle > 130 && average_score > 0.6) {
+          if (this.flag === false && this.angle > 130 && average_score > 0.6) {
             this.flag = true
-          } else if (this.flag === true && angle < 60 && average_score > 0.6) {
+          } else if (this.flag === true && this.angle < 60 && average_score > 0.6) {
             localStorage.setItem("count", countRef + 1);
             this.flag = false
             console.log("count", countRef + 1)
@@ -251,9 +252,9 @@ class PoseDetection extends Component {
           this.angle = sum / this.frameCount;
           this.angle = Math.round(this.angle);
           // 判定
-          if (this.flag === false && angle > 150 && average_score > 0.6) {
+          if (this.flag === false && this.angle > 150 && average_score > 0.6) {
             this.flag = true
-          } else if (this.flag === true && angle < 100 && average_score > 0.6) {
+          } else if (this.flag === true && this.angle < 100 && average_score > 0.6) {
             localStorage.setItem("count", countRef + 1);
             this.flag = false
             console.log("count", countRef + 1)
@@ -268,7 +269,7 @@ class PoseDetection extends Component {
       canvasCtx5.font = "60px Arial"; // フォントサイズと種類
       canvasCtx5.scale(-1, 1);
       canvasCtx5.fillText(`Angle: ${this.angle}°`, -630, 50); // 角度を描画
-      if (this.flag == true) {
+      if (this.flag === true) {
         canvasCtx5.fillStyle = "#0000FF"; // 青色のフォント
         canvasCtx5.font = "60px Arial"; // フォントサイズと種類
         canvasCtx5.fillText(`DOWN`, -200, 50); // 指示を描画
@@ -280,7 +281,24 @@ class PoseDetection extends Component {
         canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       }
       canvasCtx5.font = "70px Arial"; // フォントサイズと種類
-      canvasCtx5.fillText(`残り ${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count} 回`, -330, 470);
+      canvasCtx5.fillText(`残り ${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count} 回`, -630, 470);
+      canvasCtx5.scale(-1, 1);
+
+      // 経過時間を描画
+      canvasCtx5.scale(-1, 1);
+      canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
+      canvasCtx5.font = "90px Arial"; // フォントサイズと種類
+      let timeString = this.timeCount.toString();
+      if (timeString.length === 1) {
+        canvasCtx5.fillText(`${this.timeCount}`, -120, 470); // 経過時間を描画      
+      } else if (timeString.length === 2) {
+        canvasCtx5.fillText(`${this.timeCount}`, -160, 470); // 経過時間を描画
+      } else if (timeString.length === 3) {
+        canvasCtx5.fillText(`${this.timeCount}`, -210, 470); // 経過時間を描画
+      } else if (timeString.length === 4) {
+        canvasCtx5.fillText(`${this.timeCount}`, -260, 470); // 経過時間を描画
+      }
+      canvasCtx5.fillText(`s`, -50, 470); // 経過時間を描画
       canvasCtx5.scale(-1, 1);
     }
 
@@ -294,6 +312,14 @@ class PoseDetection extends Component {
      * 姿勢検知した座標の点を canvas に描き、video と重ねる事で表示が実現されている。
      * ----------------------------------------------------------------------- */
     const detectPose = async () => {
+
+      let timer;
+      // ストップウォッチを開始する関数
+      const startStopwatch = () => {
+        this.timeCount++;
+        timer = setTimeout(startStopwatch, 1000);
+      };
+
       function zColor(data) { // ポーズのz座標から色を生成する関数
         const z = clamp(data.from.z + 0.5, 0, 1);
         return `rgba(0, ${255 * z}, ${255 * (1 - z)}, 1)`;
@@ -375,10 +401,9 @@ class PoseDetection extends Component {
         height: 480 // カメラの高さ
       });
       camera.start(); // カメラを起動
+      // ストップウォッチを開始
+      startStopwatch();
     }
-
-    // `onResultsPose` 関数の定義
-
     /** detectPose終わり ----------------------------------------------------------------------------------- */
 
     // ここでdetectPoseが実行される。 -------------------------------------------
