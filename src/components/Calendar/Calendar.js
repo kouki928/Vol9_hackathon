@@ -21,7 +21,7 @@ function Calendar(props) {
 
   return (
     <div className='Main'>
-      {showEventModal && <EventModal />}
+      {showEventModal && <EventModal userTrainingData={userTrainingData} />}
       <div className="h-screen flex flex-col CalendarArea">
         <CalendarHeader />
         <div className="flex flex-1">

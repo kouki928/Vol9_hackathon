@@ -357,7 +357,7 @@ class PoseDetection extends Component {
 
   /* HTMLを返す -------------------------------------------------------------------------------- */
   render() {
-    const userTrainingData = this.props.userTrainingData
+    let userTrainingData = this.props.userTrainingData
     const userId = this.props.userId
 
     return (

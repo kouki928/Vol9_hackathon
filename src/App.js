@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useEffect, useContext, } from 'react';
+import React, { useEffect, useContext, useState} from 'react';
 import Sidebar from "./components/Sidebar";
 import Calendar from './components/Calendar/Calendar';
 import HamburgerMenu from './components/HamburgerMenu';
@@ -18,6 +18,7 @@ import dayjs from "dayjs";
 
 import { auth, db } from './index';
 import Loading from './components/Loading';
+import InitSetting from './components/InitSetting';
 
 
 
@@ -31,30 +32,57 @@ function App() {
 
   const { userId, setUserId, setUserTrainingData, userTrainingData } = useContext(GlobalContext);
   const [user, loading, error] = useAuthState(auth);
+  const [ firstFlag, setFirstFlag ] = useState(false)
   const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
+
+  async function getUserTrainingData() {
+
+    const TrainingRef = doc(db, "TrainingData", userId);
+    console.log(userId)
+    const docRef = await getDoc(TrainingRef);
+  
+    if (docRef.exists()) {
+      const result = await docRef.data().TrainingData;
+      return result
+    }else{
+      setDoc(doc(db, "TrainingData", userId), {
+        TrainingData : {
+          [Today] : {
+            target : {
+              AbsTraining : 0,
+              LegTraining : 0,
+              PectoralTraining : 0,
+            },
+            training : {
+              AbsTraining : 0,
+              LegTraining : 0,
+              PectoralTraining : 0,
+            },
+            totalTime : {
+              AbsTraining : 0,
+              LegTraining : 0,
+              PectoralTraining : 0
+            }
+          }
+        },
+      })
+      return false
+    }
+  }
 
   useEffect(() => {
 
     setUserId(user !== null ? user.uid : "");
 
-    async function getUserTrainingData() {
-
-      const TrainingRef = doc(db, "TrainingData", userId);
-      console.log(userId)
-      const docRef = await getDoc(TrainingRef);
-    
-      if (docRef.exists()) {
-        const result = await docRef.data().TrainingData;
-        return result
-      }else{
-        console.log("Nothing")
-      }
-    }
-
-    if (userId !== "") {
+    if (userId !== ""){
       getUserTrainingData().then(result => {
-        if (result[Today] === undefined) {
-          result[Today] = createTrainingMenu()
+
+        if (result === false) {
+          setFirstFlag(true)
+        }
+
+        else if (result[Today] === undefined) {
+          result[Today] = createTrainingMenu(result)
           setUserTrainingData(result)
           setDoc(doc(collection(db,"TrainingData"), userId), {TrainingData : result})
         }else{
@@ -78,6 +106,7 @@ function App() {
     return (<Login></Login>)
   }
 
+
   /* エラー発生時 -------------------------------------------------------------------------*/
   else if (error) {
     return (<>{error}</>)
@@ -89,6 +118,14 @@ function App() {
     if (isEmpty(userTrainingData)){
       return (<Loading></Loading>)
     }
+
+    // if (userId === "hjzTWhBLHuaI6pBNzmy8gtgBNJH3"){
+    //   setFirstFlag(true);
+    // }
+
+    // if (firstFlag) {
+    //   return (<InitSetting></InitSetting>)
+    // }
 
     return (
     <>
@@ -129,14 +166,13 @@ function App() {
 /** createTrainingMenu ----------------------------------------------------------
  * menuを生成し返す関数
  ----------------------------------------------------------------------------- */
-const createTrainingMenu = () => {
+const createTrainingMenu = (userTrainingData) => {
   let Abs = 0;
   let Leg = 0;
   let Pectoral = 0;
   let cnt = 0;
   let days = 0
   let addCount = 0;
-  const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
   for (var i=1; i<3; i++){
     let pastday = dayjs().add(-i,"day").format("YYYY/MM/DD").toString()
     if (userTrainingData[pastday] !== undefined){
@@ -170,6 +206,11 @@ const createTrainingMenu = () => {
       "PectoralTraining" : days !== 0 ? Pectoral / (days*2) | 0 + addCount : 30,
     },
     training : {
+      "AbsTraining" : 0,
+      "LegTraining" : 0,
+      "PectoralTraining" : 0,
+    },
+    totalTime : {
       "AbsTraining" : 0,
       "LegTraining" : 0,
       "PectoralTraining" : 0,

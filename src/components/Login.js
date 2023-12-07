@@ -1,10 +1,12 @@
 import React, {useState, useRef } from 'react'
-import { db, auth } from '../index';
+import { db, auth, provider } from '../index';
 import { where, collection, getDocs, query, setDoc, doc } from "firebase/firestore";
 import { signInWithEmailAndPassword,
-    createUserWithEmailAndPassword, } from "firebase/auth";
+    createUserWithEmailAndPassword, getRedirectResult, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
 
 import dayjs from "dayjs";
+import SignInWithGoogle from "../images/SignInWithGoogle.png";
+import SignUpWithGoogle from "../images/SignUpWithGoogle.png";
 
 function Login() {
 
@@ -17,9 +19,7 @@ function Login() {
     const [Email, setEmail] = useState("");
     // const [AuthPassword, setAuthPassword] = useState("");
 
-    const genderRef = useRef(null);
-    const trainingRef = useRef(null);
-    const targetRef = useRef(null);
+    
     // const EmailRef = useRef(null);
     
 
@@ -44,28 +44,30 @@ function Login() {
             return 0;
         }
 
-        let base = 0;
-        let goals = {
-            "筋肉量UP" : 30,
-            "ダイエット" : 20,
-            "健康維持" : 10
-        }
-        let frecency = {
-            "0" : 10,
-            "1" : 5,
-            "2" : 0
-        }
-        if (genderRef.current.value === "男"){
-            base += 10
-        }
-        base += goals[targetRef.current.value]
-        base += frecency[trainingRef.current.value]
+        // let base = 0;
+        // let goals = {
+        //     "筋肉量UP" : 30,
+        //     "ダイエット" : 20,
+        //     "健康維持" : 10
+        // }
+        // let frecency = {
+        //     "0" : 10,
+        //     "1" : 5,
+        //     "2" : 0
+        // }
+        // if (genderRef.current.value === "男"){
+        //     base += 10
+        // }
+        // base += goals[targetRef.current.value]
+        // base += frecency[trainingRef.current.value]
 
         createUserWithEmailAndPassword(auth, Email, password)
         .then((userCredential) => {
             const user = userCredential.user;
             const uid = user.uid;
             const today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
+
+            let base = 30
 
             /**Userが既に存在するか判定 ------------------------------------------------- */
             getDocs(query(collection(db, "User"), where("UserId","==",uid)))
@@ -124,6 +126,35 @@ function Login() {
         })
     }
 
+    const googleSignIn = async () => {
+
+        signInWithRedirect(auth, provider)
+        
+        // signInWithPopup(auth, provider)
+        // .then((result) => {
+        //     // This gives you a Google Access Token. You can use it to access the Google API.
+        //     const credential = GoogleAuthProvider.credentialFromResult(result);
+        //     const token = credential.accessToken;
+        //     // The signed-in user info.
+        //     const user = result.user;
+
+        //     console.log(token, user)
+        //     // IdP data available using getAdditionalUserInfo(result)
+        //     // ...
+        // }).catch((error) => {
+        //     // Handle Errors here.
+        //     const errorCode = error.code;
+        //     const errorMessage = error.message;
+        //     // The email of the user's account used.
+        //     const email = error.customData.email;
+        //     // The AuthCredential type that was used.
+        //     const credential = GoogleAuthProvider.credentialFromError(error);
+
+        //     console.log(errorMessage)
+        //     // ...
+        // });
+    }
+
     return (
     <div className='Form'><div className='wrap'>
 
@@ -144,8 +175,8 @@ function Login() {
         </input>
 
 
-
         <div id={active ? "" : "active"} className='SignIn'>
+            <div onClick={googleSignIn}><img src={SignInWithGoogle} alt='Google' className='googleImage'></img></div>
             <div className='GuideButton'>
             <div onClick={signIn} className='LoginButton'>ログイン</div>
             <div onClick={classToggle} className='LRToggle'>ユーザー登録はこちら</div></div>
@@ -158,27 +189,10 @@ function Login() {
                 value={SecondPassword}
                 onChange={(event) => setSecondPassword(event.target.value)} required>
             </input>
+            
 
-            <label className='InputLabel'>性別 : </label>
-            <select ref={genderRef}>
-                <option value={"男"}>男</option>
-                <option value={"女"}>女</option>
-                <option value={"その他"}>その他</option>
-            </select>
+            <div onClick={googleSignIn}><img src={SignUpWithGoogle} alt='Google' className='googleImage'></img></div>
 
-            <label className='InputLabel'>運動頻度 : </label>
-            <select ref={trainingRef}>
-                <option value={"0"}>習慣化している</option>
-                <option value={"1"}>偶に運動する（規則性はない）</option>
-                <option value={"2"}>全くしない</option>
-            </select>
-
-            <label className='InputLabel'>トレーニング目的 : </label>
-            <select ref={targetRef}>
-                <option value={"筋肉量UP"}>筋肉量UP</option>
-                <option value={"ダイエット"}>ダイエット（体重を減らす）</option>
-                <option value={"健康維持"}>健康維持</option>
-            </select>
 
             <div className='GuideButton'>
                 <div className='LoginButton' onClick={signUp}> ユーザー登録</div>

@@ -7,11 +7,11 @@ import dayjs from "dayjs";
 
 // ChartJS.register(ArcElement, Tooltip, Legend);
 
-export const EventModal = () => {
+export const EventModal = (props) => {
   const { daySelected, setShowEventModal, dispatchCalEvent, selectedEvent } =
     useContext(GlobalContext);
 
-  const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"))
+  const { userTrainingData } = props
   
   // const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
 
@@ -31,7 +31,7 @@ export const EventModal = () => {
   //   setShowEventModal(false);
   // };
 
-  if (userTrainingData === {}){
+  if (userTrainingData == {}){
     return (<></>)
   }
 

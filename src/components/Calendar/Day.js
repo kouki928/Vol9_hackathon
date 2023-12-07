@@ -29,7 +29,7 @@ export const Day = (props) => {
     const todayData = userTrainingData[dayStringElement];
     var i = 0;
     
-    // console.log(todayData)
+    console.log(todayData, dayStringElement)
 
     if (todayData === undefined && todayStringElement > dayStringElement){
       return (<p> / </p>)
