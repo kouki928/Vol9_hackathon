@@ -156,14 +156,14 @@ function Graph(props) {
 
 
     // // 消費カロリーに使用する配列の作成 ------------------------------------------------------------------------------------
-    // // 直近7日間の合計運動時間を取得し、各種目ごとに配列に整形
+    // // 直近7日間の1日ごとの合計運動時間を取得し、各種目ごとに配列に整形
     // let WeekAbsTotalTimeData = [];
     // let WeekLegTotalTimeData = [];
     // let WeekPectoralTotalTimeData = [];
     // let TodayTotalTimeData = userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"];
     // for (i = 0; i < 7; i++) {
     //     if (userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
-    //         TodayTotalTimeData = userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["target"];
+    //         TodayTotalTimeData = userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["totalTime"];
     //         WeekAbsTotalTimeData.push(TodayTotalTimeData["AbsTraining"]);
     //         WeekLegTotalTimeData.push(TodayTotalTimeData["LegTraining"]);
     //         WeekPectoralTotalTimeData.push(TodayTotalTimeData["PectoralTraining"]);
@@ -177,24 +177,27 @@ function Graph(props) {
     // /** 消費カロリーの計算方法
     //  * METs　×　体重（kg）　×　時間　×　1.05　＝　消費カロリー（kcal） */
     // let CalData = [];
+    // let AbsCalData;
+    // let LegCalData;
+    // let PectoralCalData;
+    // let METs = 3.5; // 仮
+    // let bodyWeight = [];  // 仮（日ごとに体重を取得）
     // for (i = 0; i < 7; i++) {
-    //     let dayTotalTimeSum = WeekAbsTotalTimeData[i] + WeekLegTotalTimeData[i] + WeekPectoralTotalTimeData[i];
-    //     if (dayTargetSum != 0) {
-    //         CalData.push(dayTrainingSum / dayTargetSum * 100)
-    //     } else {
-    //         CalData.push(null)
-    //     }
+    //     AbsCalData = METs * bodyWeight[i] * WeekAbsTotalTimeData[i] * 1.05;
+    //     LegCalData = METs * bodyWeight[i] * WeekLegTotalTimeData[i] * 1.05;
+    //     PectoralCalData = METs * bodyWeight[i] * WeekPectoralTotalTimeData[i] * 1.05;
+    //     CalData.push(AbsCalData+LegCalData+PectoralCalData);
     // }
     // CalData.reverse(); // デイリーの逆順を修正
 
-    const TrainingData = [20, 20, 20, 20, 12, 44, 43]
+    const CalData = [20, 20, 20, 20, 12, 44, 43]
     // 消費カロリーグラフの作成
     const CalgraphData = {
         labels: WeekTrainingLabel,
         datasets: [
             {
                 label: "消費カロリー（kcal）",
-                data: WeekTrainingLabel.map((value, key) => TrainingData[key]),
+                data: WeekTrainingLabel.map((value, key) => CalData[key]),
                 backgroundColor: 'rgb(255, 99, 132)',
             },
         ],
