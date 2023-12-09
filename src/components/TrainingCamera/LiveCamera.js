@@ -6,7 +6,7 @@
 import React, { Component, useContext } from 'react';
 import GlobalContext from '../../context/GlobalContext';
 import dayjs from 'dayjs';
-import { collection, doc, setDoc } from 'firebase/firestore';
+import { collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../index';
 
 import { Camera } from "@mediapipe/camera_utils";
@@ -31,7 +31,7 @@ class PoseDetection extends Component {
     this.width = window.innerWidth > 900 ? 640 : 320;
     this.height = window.innerWidth > 900 ? 480 : 240;
     this.trainingType = new URL(decodeURI(window.location.href)).searchParams.get("classification");
-    
+
     /** ------------------------------------------------------------------------------------------------------ 
     * this.state はclass内で大きな意味を持つ。
     * 通常、html上での変化でclass内の値を変更できないが、ここに定義した変数は自由に変更できる。
@@ -39,12 +39,14 @@ class PoseDetection extends Component {
     this.state = {
       count: props.userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType],
       buttonText: "中断する",
-      totalTime : props.userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"][this.trainingType]
+      totalTime: props.userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"][this.trainingType],
+      orientation : window.screen.orientation,
     }
     this.frameCount = 0;
     this.angleList = [];
-    this.flag = false
+    this.flag = false;
     this.angle = 0;
+    this.stopTimeCount = 0;
   }
 
   /** conmonentDidMount --------------------------------------------------------------------------
@@ -89,20 +91,21 @@ class PoseDetection extends Component {
       let average_score = 0;
       let right_average_score = 0
       let left_average_score = 0
-      // let countRef = this.state.count
-      // this.setState({
-      //   count: countRef
-      // })
       console.log(this.state.count)
 
       if (this.state.count === goal_count) {
+        canvasCtx5.scale(-1, 1);
+        canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
+        canvasCtx5.font = "100px Arial"; // フォントサイズと種類
+        canvasCtx5.fillText(`CLEAR`, -480, 275); // 指示を描画
+        canvasCtx5.scale(-1, 1);
         this.setState({
           buttonText: "完了!"
         })
         return
       }
 
-      // 胸筋
+      // 腕立て伏せ
       if (which === "PectoralTraining") {
 
         right_average_score = (
@@ -134,10 +137,6 @@ class PoseDetection extends Component {
         // 格納＆カウント
         this.angleList.push(angle);
         this.frameCount += 1;
-        canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
-        canvasCtx5.font = "40px Arial"; // フォントサイズと種類
-        canvasCtx5.fillText(`frameCount: ${this.frameCount}`, 10, 110); // 角度を描画
-        
 
         // 毎秒/２ごとに角度を平均化
         if (20 <= this.frameCount) {
@@ -149,12 +148,12 @@ class PoseDetection extends Component {
           this.angle = Math.round(this.angle);
           // 判定
           if (this.flag === false && this.angle > 120 && average_score > 0.6) {
-            this.flag = true
-          } else if (this.flag === true && this.angle < 80 && average_score > 0.6) {
-            // localStorage.setItem("count", countRef + 1);
-            this.setState({count : this.state.count+1})
-            this.flag = false
-            // console.log("count", countRef + 1)
+            this.flag = true;
+            this.stopTimeCount = 0;
+          } else if (this.flag === true && this.angle < 90 && average_score > 0.6) {
+            this.setState({ count: this.state.count + 1 })
+            this.flag = false;
+            this.stopTimeCount = 0;
           }
           // 初期化
           this.angleList = [];
@@ -189,17 +188,33 @@ class PoseDetection extends Component {
             results.poseLandmarks[26].x, results.poseLandmarks[26].y, results.poseLandmarks[26].z,
           );
         }
+        // 格納＆カウント
+        this.angleList.push(angle);
+        this.frameCount += 1;
 
-        if (this.flag === false && angle > 130 && average_score > 0.6) {
-          this.flag = true
-        } else if (this.flag === true && angle < 60 && average_score > 0.6) {
-          // localStorage.setItem("count", countRef + 1);
-          this.setState({count : this.state.count + 1})
-          this.flag = false
-          // console.log("count", countRef + 1)
+        // 毎秒/２ごとに角度を平均化
+        if (20 <= this.frameCount) {
+          // 平均
+          let sum = this.angleList.reduce(function (sum, element) {
+            return sum + element;
+          }, 0);
+          this.angle = sum / this.frameCount;
+          this.angle = Math.round(this.angle);
+          // 判定
+          if (this.flag === false && this.angle > 130 && average_score > 0.6) {
+            this.flag = true;
+            this.stopTimeCount = 0;
+          } else if (this.flag === true && this.angle < 60 && average_score > 0.6) {
+            this.setState({ count: this.state.count + 1 })
+            this.flag = false;
+            this.stopTimeCount = 0;
+          }
+          // 初期化
+          this.angleList = [];
+          this.frameCount = 0;
         }
 
-        // 足筋
+        // スクワット
       } else if (which === "LegTraining") {
         right_average_score = (
           results.poseLandmarks[23].visibility +
@@ -227,34 +242,77 @@ class PoseDetection extends Component {
             results.poseLandmarks[28].x, results.poseLandmarks[28].y, results.poseLandmarks[28].z,
           );
         }
+        // 格納＆カウント
+        this.angleList.push(angle);
+        this.frameCount += 1;
 
-        if (this.flag === false && angle > 160 && average_score > 0.6) {
-          this.flag = true
-        } else if (this.flag === true && angle < 100 && average_score > 0.6) {
-          // localStorage.setItem("count", countRef + 1);
-          this.setState({count : this.state.count + 1})
-          this.flag = false
-          // console.log("count", countRef + 1)
+        // 毎秒/２ごとに角度を平均化
+        if (20 <= this.frameCount) {
+          // 平均
+          let sum = this.angleList.reduce(function (sum, element) {
+            return sum + element;
+          }, 0);
+          this.angle = sum / this.frameCount;
+          this.angle = Math.round(this.angle);
+          // 判定
+          if (this.flag === false && this.angle > 150 && average_score > 0.6) {
+            this.flag = true;
+            this.stopTimeCount = 0;
+          } else if (this.flag === true && this.angle < 100 && average_score > 0.6) {
+            this.setState({ count: this.state.count + 1 })
+            this.flag = false;
+            this.stopTimeCount = 0;
+          }
+          // 初期化
+          this.angleList = [];
+          this.frameCount = 0;
         }
       }
+
+      // 画像内に描画
+      canvasCtx5.scale(-1, 1);
       canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
-      canvasCtx5.font = "40px Arial"; // フォントサイズと種類
-      canvasCtx5.scale(-1,1)
-      canvasCtx5.fillText(`Angle: ${this.angle}°`, -100, 30); // 角度を描画
-      canvasCtx5.scale(-1,1)
+      canvasCtx5.font = "60px Arial"; // フォントサイズと種類
+      canvasCtx5.fillText(`Angle: ${this.angle}°`, -630, 50); // 角度を描画
       if (this.flag === true) {
         canvasCtx5.fillStyle = "#0000FF"; // 青色のフォント
-        canvasCtx5.fillText(`DOWN`, 10, 70); // 角度を描画
+        canvasCtx5.font = "60px Arial"; // フォントサイズと種類
+        canvasCtx5.fillText(`DOWN`, -200, 50); // 指示を描画
         canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       } else {
         canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
-        canvasCtx5.fillText(`UP`, 10, 70); // 角度を描画
+        canvasCtx5.font = "60px Arial"; // フォントサイズと種類
+        canvasCtx5.fillText(`UP`, -150, 50); // 指示を描画
         canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       }
-    }
+      canvasCtx5.font = "70px Arial"; // フォントサイズと種類
+      canvasCtx5.fillText(`残り ${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count} 回`, -630, 470);
+      canvasCtx5.scale(-1, 1);
 
-    
-    // localStorage.setItem("count", this.state.count) // 何回筋トレしたかの情報
+      // 経過時間を描画
+      canvasCtx5.scale(-1, 1);
+      canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
+      canvasCtx5.font = "90px Arial"; // フォントサイズと種類
+      let timeString = this.state.totalTime.toString();
+      if (timeString.length === 1) {
+        canvasCtx5.fillText(`${this.state.totalTime}`, -120, 470); // 経過時間を描画      
+      } else if (timeString.length === 2) {
+        canvasCtx5.fillText(`${this.state.totalTime}`, -160, 470); // 経過時間を描画
+      } else if (timeString.length === 3) {
+        canvasCtx5.fillText(`${this.state.totalTime}`, -210, 470); // 経過時間を描画
+      } else if (timeString.length === 4) {
+        canvasCtx5.fillText(`${this.state.totalTime}`, -260, 470); // 経過時間を描画
+      }
+      canvasCtx5.fillText(`s`, -50, 470); // 経過時間を描画
+      canvasCtx5.scale(-1, 1);
+
+      // ストップ時間カウント
+      canvasCtx5.scale(-1, 1);
+      canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
+      canvasCtx5.font = "100px Arial"; // フォントサイズと種類
+      canvasCtx5.fillText(`${this.stopTimeCount}`, -480, 275); // 停止時間を描画
+      canvasCtx5.scale(-1, 1);
+    }
 
     /** detectPose --------------------------------------------------------- 
     * カメラの情報を基に姿勢を検知する関数。
@@ -262,6 +320,16 @@ class PoseDetection extends Component {
     * 姿勢検知した座標の点を canvas に描き、video と重ねる事で表示が実現されている。
     * ----------------------------------------------------------------------- */
     const detectPose = async () => {
+      let timer;
+      // ストップウォッチを開始する関数
+      const startStopwatch = () => {
+        this.stopTimeCount++;
+        if (this.stopTimeCount <= 5) {
+          this.state.totalTime++;
+        }
+        timer = setTimeout(startStopwatch, 1000);
+      };
+
       function zColor(data) { // ポーズのz座標から色を生成する関数
         const z = clamp(data.from.z + 0.5, 0, 1);
         return `rgba(0, ${255 * z}, ${255 * (1 - z)}, 1)`;
@@ -273,7 +341,8 @@ class PoseDetection extends Component {
 
         canvasCtx5.save(); // キャンバスの状態を保存
         canvasCtx5.clearRect(0, 0, video5.width, video5.height); // キャンバスをクリア
-        canvasCtx5.drawImage(results.image, 0, 0, out5.width, out5.height); // 画像を描画
+        canvasCtx5.drawImage(results.image, 120, 0, 200, window.innerHeight-100, 120, 0, out5.width, out5.height, ); // 画像を描画
+        // canvasCtx5.drawImage(results.image, 0, 0, out5.width, out5.height, ); // 画像を描画
 
         if (results.poseLandmarks === null || results.poseLandmarks === undefined) {
           return 0;
@@ -343,10 +412,9 @@ class PoseDetection extends Component {
         height: 480 // カメラの高さ
       });
       camera.start(); // カメラを起動
+      // ストップウォッチを開始
+      startStopwatch();
     }
-
-    // `onResultsPose` 関数の定義
-
     /** detectPose終わり ----------------------------------------------------------------------------------- */
 
     // ここでdetectPoseが実行される。 -------------------------------------------
@@ -354,16 +422,16 @@ class PoseDetection extends Component {
 
   }
 
-
   /* HTMLを返す -------------------------------------------------------------------------------- */
   render() {
-    let userTrainingData = this.props.userTrainingData
+    const userTrainingData = this.props.userTrainingData
     const userId = this.props.userId
 
+    
     return (
       <div className='Main'>
         <div className='CameraWrapper'>
-          <canvas ref={this.canvasRef} width={this.width} height={this.height} className='canvas' />
+          <canvas ref={this.canvasRef} width={window.innerWidth - 70} height={window.innerHeight-100} className='canvas' />
           <video ref={this.videoRef} autoPlay playsInline width={this.width} height={this.height} />
 
           <div className='TrainingCounter'>
@@ -381,9 +449,10 @@ class PoseDetection extends Component {
           <div className='TrainingButton' onClick={
             async () => {
               userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType] = this.state.count
-              
+              userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"][this.trainingType] = this.state.totalTime
+
               // localStorage.setItem("userTrainingData", JSON.stringify(userTrainingData))
-              await setDoc(doc(collection(db, "TrainingData"), userId), { TrainingData: userTrainingData });
+              await updateDoc(doc(collection(db, "TrainingData"), userId), { TrainingData: userTrainingData });
               window.location.href = "/"
             }
           }>{this.state.buttonText}</div>
@@ -397,8 +466,3 @@ class PoseDetection extends Component {
 
 PoseDetection.contextType = GlobalContext;
 export default PoseDetection;
-
-
-
-
-

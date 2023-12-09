@@ -9,7 +9,8 @@
   width: 100vw;
   height: 100vh;
   transition: all 1s;
-  background-color: #17bfaf;
+  background-color: #ffa560;
+  /* background-color: #f2711c; */
   position: fixed;
   top: 0;
   left: 0;
@@ -383,6 +384,8 @@ option {
 .canvas {
   padding: 0 24px 24px 24px;
   margin: auto;
+  /* width: 100%;
+  height: 100%; */
 }
 
 video {

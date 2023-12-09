@@ -7,18 +7,19 @@ import Login from './components/Login';
 import Home from "./components/Home/Home";
 import FooterMenu from './components/FooterMenu';
 import Graph from './components/Graph';
+import UserPage from './components/UserPage';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Setting from './components/Coupon/Setting';
 import PoseDetection from './components/TrainingCamera/LiveCamera';
 
 import GlobalContext from './context/GlobalContext';
 import { useAuthState } from "react-firebase-hooks/auth"
-import { collection, setDoc, doc, getDoc } from "firebase/firestore";
+import { collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import dayjs from "dayjs";
 
 import { auth, db } from './index';
 import Loading from './components/Loading';
-import InitSetting from './components/InitSetting';
+
 
 
 
@@ -42,32 +43,117 @@ function App() {
     const docRef = await getDoc(TrainingRef);
   
     if (docRef.exists()) {
-      const result = await docRef.data().TrainingData;
+      const result = docRef.data();
       return result
+    
+    // 存在しない = さっき登録したばかりのユーザー
     }else{
-      setDoc(doc(db, "TrainingData", userId), {
-        TrainingData : {
-          [Today] : {
-            target : {
-              AbsTraining : 0,
-              LegTraining : 0,
-              PectoralTraining : 0,
-            },
-            training : {
-              AbsTraining : 0,
-              LegTraining : 0,
-              PectoralTraining : 0,
-            },
-            totalTime : {
-              AbsTraining : 0,
-              LegTraining : 0,
-              PectoralTraining : 0
-            }
-          }
-        },
-      })
       return false
     }
+  }
+
+  const createMenu = async (result, userId) => {
+    const personalData = result.personalData;
+    const trainingData = result.TrainingData;
+    var i = 0;
+  
+    /**直近7日間のトレーニングデータを取得し、各種目ごとに配列で整形 */
+    let WeekAbsTrainingData = [];
+    let WeekLegTrainingData = [];
+    let WeekPectoralTrainingData = [];
+    let TodayTrainingData = trainingData[dayjs().format("YYYY/MM/DD")]["training"];
+    for (i = 0; i < 7; i++) {
+        if (trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
+            TodayTrainingData = trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["training"];
+            WeekAbsTrainingData.push(TodayTrainingData["AbsTraining"]);
+            WeekLegTrainingData.push(TodayTrainingData["LegTraining"]);
+            WeekPectoralTrainingData.push(TodayTrainingData["PectoralTraining"]);
+        } else {
+            WeekAbsTrainingData.push(0);
+            WeekLegTrainingData.push(0);
+            WeekPectoralTrainingData.push(0);
+        }
+    }
+  
+    // 直近7日間の目標回数を取得し、各種目ごとに配列に整形
+    let WeekAbsTargetData = [];
+    let WeekLegTargetData = [];
+    let WeekPectoralTargetData = [];
+    let TodayTargetData = trainingData[dayjs().format("YYYY/MM/DD")]["target"];
+    for (i = 0; i < 7; i++) {
+        if (trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
+            TodayTargetData = trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["target"];
+            WeekAbsTargetData.push(TodayTargetData["AbsTraining"]);
+            WeekLegTargetData.push(TodayTargetData["LegTraining"]);
+            WeekPectoralTargetData.push(TodayTargetData["PectoralTraining"]);
+        } else {
+            WeekAbsTargetData.push(0);
+            WeekLegTargetData.push(0);
+            WeekPectoralTargetData.push(0);
+        }
+    }
+  
+  
+    const sendData = {
+      Gender : personalData.gender,
+      Frequency : personalData.frequency,
+      Age : personalData.age,
+      Goal : personalData.goal,
+      Height : personalData.height,
+      Weight : personalData.weight,
+      APreviousDayCompletion : 
+      WeekAbsTargetData[0] !== 0 ? WeekAbsTrainingData[0] / WeekAbsTargetData[0] : 0,
+      AWeeklyCompletion : 
+      sum(WeekAbsTargetData) !== 0 ? sum(WeekAbsTrainingData) / sum(WeekAbsTargetData) : 0,
+      APreviousDayTarget : WeekAbsTargetData[0],
+      LPreviousDayCompletion :
+      WeekLegTargetData[0] !== 0 ? WeekLegTrainingData[0] / WeekLegTargetData[0] : 0,
+      LWeeklyCompletion : 
+      sum(WeekLegTargetData) !== 0 ? sum(WeekLegTrainingData) / sum(WeekLegTargetData) : 0,
+      LPreviousDayTarget : WeekLegTargetData[0],
+      PPreviousDayCompletion :
+      WeekPectoralTargetData[0] !== 0 ? WeekPectoralTrainingData[0] / WeekPectoralTargetData[0] : 0,
+      PWeeklyCompletion :
+      sum(WeekPectoralTargetData) !== 0 ? sum(WeekPectoralTrainingData) / sum(WeekPectoralTargetData) : 0,
+      PPreviousDayTarget : WeekPectoralTargetData[0],
+    }
+  
+    const url = "https://example.com";
+    const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
+  
+    fetch(url, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sendData
+      }),
+    }).then(response => response.json()).then((result) => {
+  
+      const data = {
+        target : result,
+        training : {
+          AbsTraining : 0,
+          LegTraining : 0,
+          PectoralTraining : 0,
+        },
+        totalTime : {
+          AbsTraining : 0,
+          LegTraining : 0,
+          PectoralTraining : 0
+        }
+      }
+  
+      result.TrainingData[Today] = data;
+  
+      setUserTrainingData(result.TrainingData)
+      setDoc(doc(collection(db,"TrainingData"), userId), {
+        TrainingData : result.TrainingData,
+        personalData : result.personalData
+      })
+    })
+  
   }
 
   useEffect(() => {
@@ -81,10 +167,14 @@ function App() {
           setFirstFlag(true)
         }
 
-        else if (result[Today] === undefined) {
-          result[Today] = createTrainingMenu(result)
-          setUserTrainingData(result)
-          setDoc(doc(collection(db,"TrainingData"), userId), {TrainingData : result})
+        else if (result.TrainingData[Today] === undefined) {
+          result.TrainingData[Today] = createTrainingMenu(result.TrainingData);
+          // result.TrainingData[Today] = await createMenu(result)
+          setUserTrainingData(result.TrainingData)
+          setDoc(doc(collection(db,"TrainingData"), userId), {
+            TrainingData : result.TrainingData,
+            personalData : result.personalData
+          })
         }else{
           setUserTrainingData(result)
         }
@@ -135,23 +225,27 @@ function App() {
         <Sidebar />
         <Switch>
           <Route exact path="/">
-            <Home userTrainingData={userTrainingData} />
+            <Home userTrainingData={userTrainingData.TrainingData} firstFlag={firstFlag} userId={userId} />
           </Route>
           <Route path="/calendar">
-            <Calendar userTrainingData={userTrainingData} />
+            <Calendar userTrainingData={userTrainingData.TrainingData} />
           </Route>
           
           <Route path='/graph'>
-            <Graph userTrainingData={userTrainingData}/>
+            <Graph userTrainingData={userTrainingData.TrainingData}/>
           </Route>
           
           <Route path="/setting">
             <Setting />
           </Route>
+          
+          <Route path="/user">
+            <UserPage personalData={userTrainingData.personalData} userId={userId}/>
+          </Route>
 
           <Route path='/training'>
             {/* <LiveCamera /> */}
-            < PoseDetection userTrainingData={userTrainingData} userId={userId}/>
+            < PoseDetection userTrainingData={userTrainingData.TrainingData} userId={userId}/>
           </Route>
           
         </Switch>
@@ -160,6 +254,16 @@ function App() {
     </BrowserRouter>
     </>
   );}
+}
+
+
+
+const sum = (arr) => {
+  const result = arr.reduce(function(sum, element){
+    return sum + element;
+  }, 0);
+
+  return result;
 }
 
 

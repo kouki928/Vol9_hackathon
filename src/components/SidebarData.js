@@ -4,6 +4,8 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
 
 export const SidebarData = [
     {
@@ -27,6 +29,12 @@ export const SidebarData = [
         icon  : <LocalOfferIcon />,
         link  : "/setting"
     },
+    {
+        title : "ユーザー",
+        icon  : < AccountCircleIcon />,
+        link  : "/user"
+
+    }
 ]
 
 export const HamburgerMenuData = {
@@ -50,6 +58,10 @@ export const HamburgerMenuData = {
         title : "トレーニング",
         icon  : <VideocamIcon />
     },
+    "/user" : {
+        title : "ユーザー",
+        icon  : < AccountCircleIcon />
+    }
     // "/training%3Fclassification=%E8%83%B8%E7%AD%8B" : {
     //     title : "トレーニング",
     //     icon  : <VideocamIcon />

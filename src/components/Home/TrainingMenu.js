@@ -18,6 +18,7 @@ function TrainingMenu(props) {
   const { setTrainingType, userId } = useContext(GlobalContext);
 
   const Today = dayjs().format("YYYY/MM/DD");
+
   const todayData = userTrainingData[Today]
   const Menu = [
     {

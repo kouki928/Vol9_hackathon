@@ -1,10 +1,8 @@
-import React, {useState, useRef } from 'react'
+import React, {useState } from 'react'
 import { db, auth, provider } from '../index';
-import { where, collection, getDocs, query, setDoc, doc } from "firebase/firestore";
+import { where, collection, getDocs, query,} from "firebase/firestore";
 import { signInWithEmailAndPassword,
-    createUserWithEmailAndPassword, getRedirectResult, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
-
-import dayjs from "dayjs";
+    createUserWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
 import SignInWithGoogle from "../images/SignInWithGoogle.png";
 import SignUpWithGoogle from "../images/SignUpWithGoogle.png";
 
@@ -44,58 +42,21 @@ function Login() {
             return 0;
         }
 
-        // let base = 0;
-        // let goals = {
-        //     "筋肉量UP" : 30,
-        //     "ダイエット" : 20,
-        //     "健康維持" : 10
-        // }
-        // let frecency = {
-        //     "0" : 10,
-        //     "1" : 5,
-        //     "2" : 0
-        // }
-        // if (genderRef.current.value === "男"){
-        //     base += 10
-        // }
-        // base += goals[targetRef.current.value]
-        // base += frecency[trainingRef.current.value]
-
         createUserWithEmailAndPassword(auth, Email, password)
         .then((userCredential) => {
             const user = userCredential.user;
             const uid = user.uid;
-            const today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
+            // const today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
 
-            let base = 30
+            // let base = 30
 
             /**Userが既に存在するか判定 ------------------------------------------------- */
             getDocs(query(collection(db, "User"), where("UserId","==",uid)))
             .then(result => {
-                if (result.docs.length === 0) {
-                    setDoc(doc(db, "TrainingData", uid), {
-                        TrainingData : {
-                            [today] : {
-                                target : {
-                                    AbsTraining : base,
-                                    LegTraining : base,
-                                    PectoralTraining : base,
-                                },
-                                training : {
-                                    AbsTraining : 0,
-                                    LegTraining : 0,
-                                    PectoralTraining : 0,
-                                },
-                                totalTime : {
-                                    AbsTraining : 0,
-                                    LegTraining : 0,
-                                    PectoralTraining : 0
-                                }
-                            }
-                        },
-                    })
-                }else{
+                if (result.docs.length !== 0) {
+
                     alert("input other uid or pass.")
+                    
                 }
             })
             
