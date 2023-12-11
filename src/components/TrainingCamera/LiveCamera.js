@@ -63,7 +63,23 @@ class PoseDetection extends Component {
     out5.style.transform = "scaleX(-1)";
     const canvasCtx5 = out5.getContext('2d');
     const userTrainingData = this.props.userTrainingData
+
     const Today = dayjs().format("YYYY/MM/DD") // 今日の日付
+
+
+
+    // 描写のためのカメラ調整パラメータ
+    // カメラサイズ / 2 - 描写したいサイズ /2
+    const cx = window.innerWidth;
+    const cy = window.innerHeight;
+    const sx = this.trainingType === "LegTraining" ? this.width / 2 - cx / 2 : 0
+    const sy = this.trainingType === "LegTraining" ? 0 : 0
+    const sWidth = this.trainingType === "LegTraining" ? window.innerWidth - 70 : window.innerWidth;
+    const sHeight = this.trainingType === "LegTraining" ? out5.height : out5.height
+    const dx = this.trainingType === "LegTraining" ? 0 : 0
+    const dy = this.trainingType === "LegTraining" ? 0 : 0
+    const dWidth = this.trainingType === "LegTraining" ? window.innerWidth - 70 : window.innerWidth;
+    const dHeight = this.trainingType === "LegTraining" ? window.innerHeight : window.innerHeight;
 
     /**calculateAngleWithin180 --------------------------------------------------------------------------
    * webカメラから得た座標情報を基に角度を計算する関数。
@@ -341,7 +357,7 @@ class PoseDetection extends Component {
 
         canvasCtx5.save(); // キャンバスの状態を保存
         canvasCtx5.clearRect(0, 0, video5.width, video5.height); // キャンバスをクリア
-        canvasCtx5.drawImage(results.image, 120, 0, 200, window.innerHeight-100, 120, 0, out5.width, out5.height, ); // 画像を描画
+        canvasCtx5.drawImage(results.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight, ); // 画像を描画
         // canvasCtx5.drawImage(results.image, 0, 0, out5.width, out5.height, ); // 画像を描画
 
         if (results.poseLandmarks === null || results.poseLandmarks === undefined) {

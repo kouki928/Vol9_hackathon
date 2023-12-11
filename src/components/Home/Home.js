@@ -4,6 +4,7 @@ import TrainingMenu from './TrainingMenu';
 import { collection, updateDoc, doc,} from "firebase/firestore";
 import { db } from '../..';
 import dayjs from "dayjs";
+import { goalToNum, goal, gender, frequency } from '../utility/utilitys';
 
 function Home(props) {
 
@@ -78,25 +79,6 @@ function Home(props) {
 
     if (cnt !== 0){
       return 0
-    }
-
-
-    let gender = {
-      "男" : "Male",
-      "女" : "Female",
-      "その他" : "Other"
-    }
-
-    let frequency = {
-      "0" : "High",
-      "1" : "Moderate",
-      "2" : "Low"
-    }
-
-    let goal = {
-      "筋肉量UP" : "MuscleStrength",
-      "ダイエット" : "WeightLoss",
-      "健康維持" : "HealthMaintenance"
     }
 
     const personalData = {
