@@ -19,9 +19,12 @@ import dayjs from "dayjs";
 
 import { auth, db } from './index';
 import Loading from './components/Loading';
-import { Tensor, InferenceSession } from 'onnxjs';
 import { goal, gender, frequency } from './components/utility/utilitys';
+import * as ort from "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/esm/ort.min.js";
 
+// import { getData } from '../public/model';
+
+// getData()
 
 
 
@@ -183,7 +186,6 @@ function App() {
         }
       })
     }
-
     return () => {
       console.log("Anmounted")
     }
@@ -252,7 +254,7 @@ function App() {
 }
 
 
-const parsonSelection = async (data) => {
+const parsonSelection = async (data, session) => {
   // 目標BMIに基づく理想体重の算出
   const goal_bmi = {
       "Male": { "MuscleStrength": 25.0, "WeightLoss": 22.0, "HealthMaintenance": 24.0 },
@@ -299,28 +301,68 @@ const parsonSelection = async (data) => {
   // 予測＆格納
   // const keys = ["A", "L", "P"];
   const keys = ["A"]
-  for (const key of keys) {
-      // ONNXモデルのダウンロード
-      // const path = "src/models/userInfo_Amodel.onnx"
-      const modelFile = `./models/userInfo_${key}model.onnx`;
-      // const modelResponse = await fetch(modelFile);
-      // const modelBuffer = await modelResponse.arrayBuffer();
+
+  const modelFile = `./models/userInfo_Amodel.onnx`;
+  // if (typeof fetch !== 'undefined') {
+  //   const response = await fetch(modelFile);
+  //   const buffer = await response.arrayBuffer();
+  //   console.log(buffer)
+  //   const option =  {executionProviders: ['webgl']};
+
+  //   try {
+  //     const session = await InferenceSession.create(buffer, option); // データのArrayBufferとオプションを指定
+  //     console.log(session.inputNames, session.outputNames);
+
+  //   }
+  //   catch(e) {
+  //     console.log(e)
+  //   }
+  // }
+
+
+
+  // const option =  {executionProviders: ['webgl']};
+  // for (const key of keys) {
+  //     // ONNXモデルのダウンロード
+  //     // const path = "src/models/userInfo_Amodel.onnx"
+  //     const modelFile = `./models/userInfo_${key}model.onnx`;
+
+  //     const session = await InferenceSession.create('model.onnx', option);
+
+  //   // ONNXモデルの読み込み
+  //     session.loadModel(modelFile).then(() => {
+  //       // 推論のための入力データの作成
+    
+  //       const inputTensor = new Tensor('float32', new_data, [1,16 /* input shape dimensions here */]);
+
+  //       // 推論の実行
+  //       const outputMap = session.run([inputTensor]);
+
+  //       // 推論結果の処理
+  //       const outputTensor = outputMap.values().next().value;
+  //       const outputData = outputTensor.data;
+  //       console.log('Output:', outputData);
+  //     }).catch((error) => {
+  //       console.error('Error loading the ONNX model:', error);
+  //     });
+  //     // const modelResponse = await fetch(modelFile);
+  //     // const modelBuffer = await modelResponse.arrayBuffer();
       // const modelData = new Uint8Array(modelBuffer);
 
       // console.log(modelBuffer)
 
       // ONNXモデルのセッションの初期化
       // const session = new InferenceSession({ backendHint: 'webgl' });
-      const session = new InferenceSession()
-      await session.loadModel("./models/userInfo_Pmodel.onnx");
-      console.log("Ok")
-      const inputs = [
-        new Tensor(new_data, "float32", [1,16]),
-      ];
+      // const session = new InferenceSession()
+      // await session.loadModel("./models/userInfo_Pmodel.onnx");
+      // console.log("Ok")
+      // const inputs = [
+      //   new Tensor(new_data, "float32", [1,16]),
+      // ];
 
-      const outputMap = await session.run(inputs);
-      const outputTensor = outputMap.values().next().value;
-      console.log(outputTensor)
+      // const outputMap = await session.run(inputs);
+      // const outputTensor = outputMap.values().next().value;
+      // console.log(outputTensor)
 
 
       // await session.loadModel(modelData);
@@ -352,7 +394,7 @@ const parsonSelection = async (data) => {
       // 推論結果を格納
       // const category_mapping = { "A": "AbsTraining", "L": "LegTraining", "P": "PectoralTraining" };
       // TargetRepsDict[category_mapping[key]] = outputData.values().next().value.data[0];
-  }
+  // }
   // return TargetRepsDict;
 }
 

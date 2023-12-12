@@ -12,6 +12,7 @@ import { db } from '../../index';
 import { Camera } from "@mediapipe/camera_utils";
 import { drawConnectors, drawLandmarks, clamp } from "@mediapipe/drawing_utils";
 import { Pose, POSE_CONNECTIONS, POSE_LANDMARKS_LEFT, POSE_LANDMARKS_NEUTRAL, POSE_LANDMARKS_RIGHT } from "@mediapipe/pose/pose";
+import { transform } from 'typescript';
 
 /** PoseDetection ----------------------------------------------------------
 * Componentクラスを継承したクラス。クラスである意味は特になく、検索結果の産物
@@ -28,8 +29,10 @@ class PoseDetection extends Component {
     super(props);
     this.videoRef = React.createRef();
     this.canvasRef = React.createRef();
-    this.width = window.innerWidth > 900 ? 640 : 320;
-    this.height = window.innerWidth > 900 ? 480 : 240;
+    // this.width = window.innerWidth > 900 ? 640 : 320;
+    // this.height = window.innerWidth > 900 ? 480 : 240;
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
     this.trainingType = new URL(decodeURI(window.location.href)).searchParams.get("classification");
 
     /** ------------------------------------------------------------------------------------------------------ 
@@ -62,25 +65,28 @@ class PoseDetection extends Component {
     const out5 = this.canvasRef.current;
     out5.style.transform = "scaleX(-1)";
     const canvasCtx5 = out5.getContext('2d');
+    // canvasCtx5.rotate((90 * Math.PI) / 180)
     const userTrainingData = this.props.userTrainingData
 
     const Today = dayjs().format("YYYY/MM/DD") // 今日の日付
 
+    const trainingType = this.trainingType
 
 
     // 描写のためのカメラ調整パラメータ
     // カメラサイズ / 2 - 描写したいサイズ /2
     const cx = window.innerWidth;
     const cy = window.innerHeight;
-    const sx = this.trainingType === "LegTraining" ? this.width / 2 - cx / 2 : 0
+    const sx = this.trainingType === "LegTraining" ? cx / 2 : 0
     const sy = this.trainingType === "LegTraining" ? 0 : 0
-    const sWidth = this.trainingType === "LegTraining" ? window.innerWidth - 70 : window.innerWidth;
+    const sWidth = this.trainingType === "LegTraining" ? window.innerWidth : window.innerWidth;
     const sHeight = this.trainingType === "LegTraining" ? out5.height : out5.height
     const dx = this.trainingType === "LegTraining" ? 0 : 0
     const dy = this.trainingType === "LegTraining" ? 0 : 0
-    const dWidth = this.trainingType === "LegTraining" ? window.innerWidth - 70 : window.innerWidth;
+    const dWidth = this.trainingType === "LegTraining" ? window.innerWidth : window.innerWidth;
     const dHeight = this.trainingType === "LegTraining" ? window.innerHeight : window.innerHeight;
 
+    console.log(out5.height, out5.width)
     /**calculateAngleWithin180 --------------------------------------------------------------------------
    * webカメラから得た座標情報を基に角度を計算する関数。
    --------------------------------------------------------------------------------------------------*/
@@ -324,10 +330,12 @@ class PoseDetection extends Component {
 
       // ストップ時間カウント
       canvasCtx5.scale(-1, 1);
+      // canvasCtx5.rotate(90);
       canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
       canvasCtx5.font = "100px Arial"; // フォントサイズと種類
       canvasCtx5.fillText(`${this.stopTimeCount}`, -480, 275); // 停止時間を描画
       canvasCtx5.scale(-1, 1);
+      // canvasCtx5.rotate(-90)
     }
 
     /** detectPose --------------------------------------------------------- 
@@ -357,6 +365,11 @@ class PoseDetection extends Component {
 
         canvasCtx5.save(); // キャンバスの状態を保存
         canvasCtx5.clearRect(0, 0, video5.width, video5.height); // キャンバスをクリア
+
+        if (trainingType !== "LegTraining") {
+          // canvasCtx5.rotate(-90)
+        }
+
         canvasCtx5.drawImage(results.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight, ); // 画像を描画
         // canvasCtx5.drawImage(results.image, 0, 0, out5.width, out5.height, ); // 画像を描画
 
@@ -436,19 +449,29 @@ class PoseDetection extends Component {
     // ここでdetectPoseが実行される。 -------------------------------------------
     detectPose()
 
+    if (this.trainingType !== "LegTraining"){
+      this.canvasRef.current.style.transform = "rotate(90)"
+    }
+
+    return () => {
+      this.canvasRef.current.style.transform = "rotate(270)"
+    }
+
   }
 
   /* HTMLを返す -------------------------------------------------------------------------------- */
   render() {
     const userTrainingData = this.props.userTrainingData
     const userId = this.props.userId
-
+    const cx = window.innerWidth > 900 ? window.innerWidth - 250 : window.innerWidth;
+    const cy = window.innerWidth > 900 ? window.innerHeight : window.innerHeight - 91.8;
+  
     
     return (
       <div className='Main'>
         <div className='CameraWrapper'>
-          <canvas ref={this.canvasRef} width={window.innerWidth - 70} height={window.innerHeight-100} className='canvas' />
-          <video ref={this.videoRef} autoPlay playsInline width={this.width} height={this.height} />
+          <canvas ref={this.canvasRef} width={cx} height={cy} className='canvas' />
+          <video ref={this.videoRef} autoPlay playsInline width={cx} height={cy} />
 
           <div className='TrainingCounter'>
             <div className='CounterHeader'>
