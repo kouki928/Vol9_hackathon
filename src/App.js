@@ -35,13 +35,13 @@ function App() {
 
   const { userId, setUserId, setUserTrainingData, userTrainingData } = useContext(GlobalContext);
   const [user, loading, error] = useAuthState(auth);
-  const [ firstFlag, setFirstFlag ] = useState(false)
+  const [ firstFlag, setFirstFlag ] = useState(false);
+  const [complite , setComplite] = useState(false);
   const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
 
   async function getUserTrainingData() {
 
     const TrainingRef = doc(db, "TrainingData", userId);
-    console.log(userId)
     const docRef = await getDoc(TrainingRef);
   
     if (docRef.exists()) {
@@ -172,7 +172,7 @@ function App() {
         else if (result.TrainingData[Today] === undefined) {
           result.TrainingData[Today] = createTrainingMenu(result.TrainingData);
           // result.TrainingData[Today] = await createMenu(result)
-          setUserTrainingData(result.TrainingData)
+          setUserTrainingData(result)
           setDoc(doc(collection(db,"TrainingData"), userId), {
             TrainingData : result.TrainingData,
             personalData : result.personalData

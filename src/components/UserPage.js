@@ -37,6 +37,33 @@ function UserPage(props) {
         })
     }
 
+    const getWeight = async () => {
+        const ip = "10.77.112.45"
+        const url = `http://${ip}:8000/`
+
+        const response = await fetch(url, {
+            mode: 'no-cors'
+          }); // リクエスト先のURLを適切に変更
+
+        console.log(response)
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const result = await response.json();
+        console.log(result)
+        // fetch(url, {
+        //     method : "GET",
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+                
+        //     }),
+        // }).then(response => response.json()).then((result) => {
+        //     console.log(result)
+        // })
+    }
+
     return (
         <div className='Main'>
             <h2>ユーザ情報を変更できます。</h2>
@@ -77,7 +104,11 @@ function UserPage(props) {
             </select>
 
             <button className='LoginButton' type='submit' onClick={savePersonalData}> メニュー生成</button>
+
+            <button className='LoginButton' type='button' onClick={getWeight}>fetch テスト</button>
         </div>
+
+        
     )
 }
 
