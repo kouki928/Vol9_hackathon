@@ -8,10 +8,17 @@
 :root {
   padding: 0;
   margin: 0;
-  --color0: #ee7d38;
-  --color1: #dc5400;
+  --color0: #ff8400;
+  --color1: #ffa048;
   --color2: #808080;
   --button: #808080;
+}
+
+* {
+  font-family: "UD デジタル 教科書体 N-B", "UD Digi Kyokasho N-B";
+  /* font-family: "Noto Sans CJK JP";
+  font-weight: 1000; */
+  font-size: 16.54px;
 }
 
 /* 色を指定するプロパティに var(--color0)のように入力 */
@@ -20,13 +27,14 @@
   width: 100vw;
   height: 100vh;
   transition: all 1s;
-  background-color: var(--color0);
+  background-color: var(--color1);
   /* background-color: #f2711c; */
   position: fixed;
   top: 0;
   left: 0;
   z-index: 9999;
 }
+
 .spinner {
   width: 100px;
   height: 100px;
@@ -35,13 +43,16 @@
   border-radius: 100%;
   animation: sk-scaleout 1.0s infinite ease-in-out;
 }
+
 /* Loading Animation */
 @keyframes sk-scaleout {
   0% {
-      transform: scale(0);
-  } 100% {
-      transform: scale(1.0);
-      opacity: 0;
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1.0);
+    opacity: 0;
   }
 }
 
@@ -57,10 +68,22 @@
 .header {
   display: none;
   padding: 10px;
-  background-color: #2d445d;
+  background-color: var(--color0);
   color: white;
   width: 100%;
+  top: 0;
+  position: fixed;
 }
+
+/* .header {
+  display: flex;
+  padding: 10px;
+  background-color: var(--color0);
+  color: white;
+  width: auto;
+  position: fixed;
+  top: 0;
+} */
 
 .footer {
   display: none;
@@ -71,6 +94,8 @@
   width: 100%;
   height: 100vh -52px;
   display: flex;
+  /* flex-direction: column; */
+  padding-top: 50px;
   /* justify-content: center; */
   /* align-items: center; */
 }
@@ -89,7 +114,7 @@
 .Sidebar {
   height: 100vh;
   width: 250px;
-  background-color: #2d445d;
+  background-color: var(--color0);
   position: fixed;
 }
 
@@ -100,7 +125,7 @@
 }
 
 .SidebarList #active {
-  background-color: #3b627a;
+  background-color: var(--color1);
 }
 
 .SidebarList .row {
@@ -114,7 +139,7 @@
 
 .SidebarList .row:hover {
   cursor: pointer;
-  background-color: #3b627a;
+  background-color: var(--color1);
 }
 
 .row #icon {
@@ -139,7 +164,7 @@
   width: 100%;
 }
 
-.SidebarIcon p{
+.SidebarIcon p {
   font-weight: 600;
   font-size: 13px;
   color: white;
@@ -186,10 +211,11 @@
 }
 
 .nav-toggle#active span:nth-of-type(2) {
-  opacity: 0;/*真ん中の線は透過*/
+  opacity: 0;
+  /*真ん中の線は透過*/
 }
 
-.nav-toggle#active span:nth-of-type(3){
+.nav-toggle#active span:nth-of-type(3) {
   top: 30px;
   left: 10px;
   transform: translateY(-8px) rotate(45deg);
@@ -205,7 +231,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #2d445d;
+  background-color: var(--color0);
   color: white;
   margin: 0 auto;
   width: 100%;
@@ -219,7 +245,7 @@
   margin: 1.5rem;
   display: block;
   width: 300px;
-  background-color: #3b627a;
+  background-color: var(--color0);
   border-radius: 6px;
 }
 
@@ -255,8 +281,9 @@ input {
 }
 
 select {
-  color : black;
-  font-size: 1rem;;
+  color: black;
+  font-size: 1rem;
+  ;
   margin-bottom: 1rem;
   height: 40px;
   width: 100%;
@@ -278,7 +305,7 @@ option {
   display: block;
 }
 
-.GuideButton{
+.GuideButton {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -288,7 +315,7 @@ option {
   /* margin-left: 1rem; */
   padding: 10px 15px;
   border-radius: 6px;
-  background-color: #2d445d;
+  background-color: var(--color0);
 }
 
 .LRToggle {
@@ -323,7 +350,7 @@ option {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #3b627a;
+  background-color: var(--color0);
   color: white;
   width: 300px;
   border-radius: 6px;
@@ -363,15 +390,16 @@ option {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #3b627a;
+  background-color: var(--color0);
   color: white;
   width: 270px;
   border-radius: 5px;
   margin: 15px auto;
   padding: 10px;
 }
-.TrainingText:hover{
-  background-color: #2d445d;
+
+.TrainingText:hover {
+  background-color: var(--color1);
 }
 
 .TrainingTitle {
@@ -383,7 +411,7 @@ option {
   margin-right: 10px;
 }
 
-.TrainingCount p{
+.TrainingCount p {
   font-size: large;
 }
 
@@ -400,9 +428,8 @@ option {
 }
 
 video {
-  /* visibility: hidden; */
-  /* padding-top: 100vh; */
-  /* display: none; */
+  visibility: hidden;
+  display: none;
 }
 
 .TrainingCounter {
@@ -411,15 +438,17 @@ video {
   margin: auto;
 }
 
-.CounterHeader, .CounterBox {
+.CounterHeader,
+.CounterBox {
   display: flex;
 }
 
 
-.CounterHeader h2, .CounterBox h2 {
+.CounterHeader h2,
+.CounterBox h2 {
   flex: 1;
   text-align: center;
-  border: #2d445d solid 1px;
+  border: var(--color0) solid 1px;
 
   font-size: 30px;
 }
@@ -431,7 +460,7 @@ video {
   margin: 30px auto;
   border-radius: 5px;
   color: white;
-  background-color: #3b627a;
+  background-color: var(--color0);
 }
 
 
@@ -449,7 +478,7 @@ video {
 }
 
 .CalendarModalButton {
-  background-color: #2d445d;
+  background-color: var(--color0);
 }
 
 .CalendarDays {
@@ -483,7 +512,7 @@ video {
   border-radius: 50%;
   width: 10px;
   height: 10px;
-  background: #2d445d;
+  background: var(--color0);
   margin: auto;
   margin-top: 20px;
 }
@@ -502,7 +531,10 @@ video {
 }
 
 
-.CircleGood, .CircleNice, .CircleBad, .Traiangle {
+.CircleGood,
+.CircleNice,
+.CircleBad,
+.Traiangle {
   width: 15px;
   height: 15px;
   margin: auto;
@@ -532,7 +564,7 @@ video {
 }
 
 .CalendarTrainingText {
-  background-color: #3b627a;
+  background-color: var(--color0);
   color: white;
   margin: 10px;
   border-radius: 5px;
@@ -560,7 +592,7 @@ progress {
 .PointBox {
   width: 650px;
   /* border: #2d445d solid 3px; */
-  background-color: #3b627a;
+  background-color: var(--color0);
   color: white;
   border-radius: 8px;
   margin: 20px auto;
@@ -590,8 +622,8 @@ progress {
 .CouponBox {
   width: calc(100% / 2 - 10%);
   padding: 12px;
-  margin : 12px auto;
-  border: grey solid 0.5px;
+  margin: 12px auto;
+  border: var(--color0) solid 0.5px;
   border-radius: 6px;
 }
 
@@ -656,22 +688,22 @@ progress {
   .Subbar#active .overlay {
     display: block;
     position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background-color:rgba(0,0,0,0.5);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
     z-index: 100;
   }
 
   .Subbar#active .Sidebar {
     display: block;
     position: fixed;
-    top:0;
-    left:0;
-    width:250px;
-    height:100vh;
-    background-color: #2d445d;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    background-color: var(--color0);
     z-index: 200;
   }
 
@@ -682,7 +714,7 @@ progress {
 
   .CalendarDayBox {
     border-width: 0px;
-    border-top: 1px solid #acacac;
+    border-top: 1.5px solid var(--color0);
     margin-bottom: 10px;
   }
 
@@ -708,7 +740,7 @@ progress {
     width: 100%;
     padding: 0 1.5rem;
     /* background-color: rgb(243, 242, 242); */
-    background-color: #2d445d;
+    background-color: var(--color0);
     color: white;
     border-top: 1px solid #acacac;
     position: fixed;
@@ -737,7 +769,7 @@ progress {
 
   .CurrentPage {
     flex: 1;
-    background-color: #3b627a;
+    background-color: var(--color1);
     border-radius: 10px;
   }
 
@@ -745,7 +777,10 @@ progress {
     width: 300px;
   }
 
-  .CircleGood, .CircleNice, .CircleBad, .Traiangle {
+  .CircleGood,
+  .CircleNice,
+  .CircleBad,
+  .Traiangle {
     width: 10px;
     height: 10px;
     margin: auto;
@@ -759,10 +794,10 @@ progress {
   .PointBox {
     width: 300px;
     /* border: #2d445d solid 3px; */
-    background-color: #3b627a;
+    background-color: var(--color0);
     color: white;
-    border-radius: 8px;
-    margin: 5px auto;
+    border-radius: 20px;
+    margin: 15px auto;
     padding: 15px;
   }
 
@@ -772,6 +807,10 @@ progress {
 
   .UserId {
     margin-right: 10px;
+  }
+
+  .canvas {
+    top: 0;
   }
 
 }

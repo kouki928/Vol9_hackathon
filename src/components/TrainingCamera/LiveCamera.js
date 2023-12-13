@@ -502,7 +502,7 @@ class PoseDetection extends Component {
     const userTrainingData = this.props.userTrainingData
     const userId = this.props.userId
     const cx = window.innerWidth > 900 ? window.innerWidth - 250 : window.innerWidth;
-    const cy = window.innerWidth > 900 ? window.innerHeight : window.innerHeight - 91.8;
+    const cy = window.innerWidth > 900 ? window.innerHeight : window.innerHeight;
     
     const width = window.innerWidth;
     const height = width / 4 * 3
