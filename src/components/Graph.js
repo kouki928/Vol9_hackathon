@@ -35,7 +35,7 @@ function Graph(props) {
 
     const { userTrainingData, personalData, weights } = props;
 
-    const weight = personalData.weight;
+    const weight = Math.round(personalData.weight);
 
     // デイリー達成率グラフのオプション
     const RateOption = {
@@ -81,13 +81,14 @@ function Graph(props) {
                 type: 'linear',
                 display: true,
                 position: 'left',
+                min: 0,
             },
         },
     };
 
     // 直近7日間の曜日ラベルを生成
     let WeekTrainingLabel = [];
-    for (var i = 0; i < 7; i++) {
+    for (let i = 0; i < 7; i++) {
         WeekTrainingLabel.push(dayjs().add(-i, "day").format("MM/DD"));
     }
     WeekTrainingLabel.reverse();
@@ -98,7 +99,7 @@ function Graph(props) {
     let WeekLegTrainingData = [];
     let WeekPectoralTrainingData = [];
     let TodayTrainingData = userTrainingData[dayjs().format("YYYY/MM/DD")]["training"];
-    for (i = 0; i < 7; i++) {
+    for (let i = 0; i < 7; i++) {
         if (userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
             TodayTrainingData = userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["training"];
             WeekAbsTrainingData.push(TodayTrainingData["AbsTraining"]);
@@ -110,13 +111,16 @@ function Graph(props) {
             WeekPectoralTrainingData.push(0);
         }
     }
+    WeekAbsTrainingData.reverse();
+    WeekLegTrainingData.reverse();
+    WeekPectoralTrainingData.reverse();
 
     // 直近7日間の目標回数を取得し、各種目ごとに配列に整形
     let WeekAbsTargetData = [];
     let WeekLegTargetData = [];
     let WeekPectoralTargetData = [];
     let TodayTargetData = userTrainingData[dayjs().format("YYYY/MM/DD")]["target"];
-    for (i = 0; i < 7; i++) {
+    for (let i = 0; i < 7; i++) {
         if (userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
             TodayTargetData = userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["target"];
             WeekAbsTargetData.push(TodayTargetData["AbsTraining"]);
@@ -128,19 +132,22 @@ function Graph(props) {
             WeekPectoralTargetData.push(0);
         }
     }
+    WeekAbsTargetData.reverse();
+    WeekLegTargetData.reverse();
+    WeekPectoralTargetData.reverse();
 
     // 一日ごとの達成率を算出＆配列に格納
     let RateData = [];
-    for (i = 0; i < 7; i++) {
+    for (let i = 0; i < 7; i++) {
         let dayTrainingSum = WeekAbsTrainingData[i] + WeekLegTrainingData[i] + WeekPectoralTrainingData[i];
         let dayTargetSum = WeekAbsTargetData[i] + WeekLegTargetData[i] + WeekPectoralTargetData[i];
-        if (dayTargetSum != 0) {
-            RateData.push(dayTrainingSum / dayTargetSum * 100)
+        if (dayTargetSum !== 0) {
+            RateData.push(Math.round((dayTrainingSum / dayTargetSum * 100) * 10) / 10);
         } else {
-            RateData.push(null)
+            RateData.push(0)
         }
     }
-    RateData.reverse(); // デイリーの逆順を修正
+    RateData.reverse();
 
     // デイリー達成率グラフの作成
     const trainingRate = {
@@ -157,42 +164,56 @@ function Graph(props) {
 
 
 
-    // // 消費カロリーに使用する配列の作成 ------------------------------------------------------------------------------------
-    // // 直近7日間の1日ごとの合計運動時間を取得し、各種目ごとに配列に整形
-    // let WeekAbsTotalTimeData = [];
-    // let WeekLegTotalTimeData = [];
-    // let WeekPectoralTotalTimeData = [];
-    // let TodayTotalTimeData = userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"];
-    // for (i = 0; i < 7; i++) {
-    //     if (userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
-    //         TodayTotalTimeData = userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["totalTime"];
-    //         WeekAbsTotalTimeData.push(TodayTotalTimeData["AbsTraining"]);
-    //         WeekLegTotalTimeData.push(TodayTotalTimeData["LegTraining"]);
-    //         WeekPectoralTotalTimeData.push(TodayTotalTimeData["PectoralTraining"]);
-    //     } else {
-    //         WeekAbsTotalTimeData.push(0);
-    //         WeekLegTotalTimeData.push(0);
-    //         WeekPectoralTotalTimeData.push(0);
-    //     }
-    // }
-    // // 一日ごとの消費カロリーを算出＆配列に格納
-    // /** 消費カロリーの計算方法
-    //  * METs　×　体重（kg）　×　時間　×　1.05　＝　消費カロリー（kcal） */
-    // let CalData = [];
-    // let AbsCalData;
-    // let LegCalData;
-    // let PectoralCalData;
-    // let METs = 3.5; // 仮
-    // let bodyWeight = [];  // 仮（日ごとに体重を取得）
-    // for (i = 0; i < 7; i++) {
-    //     AbsCalData = METs * bodyWeight[i] * WeekAbsTotalTimeData[i] * 1.05;
-    //     LegCalData = METs * bodyWeight[i] * WeekLegTotalTimeData[i] * 1.05;
-    //     PectoralCalData = METs * bodyWeight[i] * WeekPectoralTotalTimeData[i] * 1.05;
-    //     CalData.push(AbsCalData+LegCalData+PectoralCalData);
-    // }
-    // CalData.reverse(); // デイリーの逆順を修正
+    // 消費カロリーに使用する配列の作成 ------------------------------------------------------------------------------------
+    // 直近7日間の1日ごとの合計運動時間を取得し、各種目ごとに配列に整形
+    let WeekAbsTotalTimeData = [];
+    let WeekLegTotalTimeData = [];
+    let WeekPectoralTotalTimeData = [];
+    let TodayTotalTimeData = userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"];
+    for (let i = 0; i < 7; i++) {
+        if (userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
+            TodayTotalTimeData = userTrainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["totalTime"];
+            WeekAbsTotalTimeData.push(TodayTotalTimeData["AbsTraining"]);
+            WeekLegTotalTimeData.push(TodayTotalTimeData["LegTraining"]);
+            WeekPectoralTotalTimeData.push(TodayTotalTimeData["PectoralTraining"]);
+        } else {
+            WeekAbsTotalTimeData.push(0);
+            WeekLegTotalTimeData.push(0);
+            WeekPectoralTotalTimeData.push(0);
+        }
+    }
+    WeekAbsTotalTimeData.reverse();
+    WeekLegTotalTimeData.reverse();
+    WeekPectoralTotalTimeData.reverse();
 
-    const CalData = [20, 20, 20, 20, 12, 44, 43]
+    // 一日ごとの消費カロリーを算出＆配列に格納
+    /** 消費カロリーの計算方法
+     * METs　×　体重（kg）　×　時間　×　1.05　＝　消費カロリー（kcal） */
+    let CalData = [];
+    let AbsCalData;
+    let LegCalData;
+    let PectoralCalData;
+    let METs = 3.5; // 仮
+    let WeekWeightData = [];
+    let lastValidWeight = null;
+    // 直近７日間の体重を取得
+    for (let i = 0; i < 7; i++) {
+        const currentWeight = weights[dayjs().subtract(i, 'day').format('YYYY/MM/DD')];
+        if (currentWeight !== undefined) {
+            WeekWeightData.push(Math.round(currentWeight));
+        } else {
+            WeekWeightData.push(Math.round(weight));
+        }
+    }
+    WeekWeightData.reverse();
+
+    for (let i = 0; i < 7; i++) {
+        AbsCalData = METs * WeekWeightData[i] * ((WeekAbsTotalTimeData[i]) / 3600) * 1.05;
+        LegCalData = METs * WeekWeightData[i] * ((WeekLegTotalTimeData[i]) / 3600) * 1.05;
+        PectoralCalData = METs * WeekWeightData[i] * ((WeekPectoralTotalTimeData[i]) / 3600) * 1.05;
+        CalData.push(Math.round((AbsCalData + LegCalData + PectoralCalData) * 10) / 10);
+    }
+
     // 消費カロリーグラフの作成
     const CalgraphData = {
         labels: WeekTrainingLabel,
