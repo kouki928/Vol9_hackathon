@@ -42,6 +42,12 @@ function App() {
   const [complite , setComplite] = useState(false);
   const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
 
+  const [parentStyle, setParentStyle] = useState(false);
+
+  const handleStyleChange = (newStyle) => {
+    setParentStyle(newStyle);
+  };
+
   async function getUserTrainingData() {
 
     const TrainingRef = doc(db, "TrainingData", userId);
@@ -57,111 +63,134 @@ function App() {
     }
   }
 
-  const createMenu = async (result, userId) => {
-    const personalData = result.personalData;
-    const trainingData = result.TrainingData;
-    var i = 0;
   
-    /**直近7日間のトレーニングデータを取得し、各種目ごとに配列で整形 */
-    let WeekAbsTrainingData = [];
-    let WeekLegTrainingData = [];
-    let WeekPectoralTrainingData = [];
-    let TodayTrainingData = trainingData[dayjs().format("YYYY/MM/DD")]["training"];
-    for (i = 0; i < 7; i++) {
-        if (trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
-            TodayTrainingData = trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["training"];
-            WeekAbsTrainingData.push(TodayTrainingData["AbsTraining"]);
-            WeekLegTrainingData.push(TodayTrainingData["LegTraining"]);
-            WeekPectoralTrainingData.push(TodayTrainingData["PectoralTraining"]);
-        } else {
-            WeekAbsTrainingData.push(0);
-            WeekLegTrainingData.push(0);
-            WeekPectoralTrainingData.push(0);
-        }
-    }
-  
-    // 直近7日間の目標回数を取得し、各種目ごとに配列に整形
-    let WeekAbsTargetData = [];
-    let WeekLegTargetData = [];
-    let WeekPectoralTargetData = [];
-    let TodayTargetData = trainingData[dayjs().format("YYYY/MM/DD")]["target"];
-    for (i = 0; i < 7; i++) {
-        if (trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
-            TodayTargetData = trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["target"];
-            WeekAbsTargetData.push(TodayTargetData["AbsTraining"]);
-            WeekLegTargetData.push(TodayTargetData["LegTraining"]);
-            WeekPectoralTargetData.push(TodayTargetData["PectoralTraining"]);
-        } else {
-            WeekAbsTargetData.push(0);
-            WeekLegTargetData.push(0);
-            WeekPectoralTargetData.push(0);
-        }
-    }
-  
-  
-    const sendData = {
-      Gender : gender[personalData.gender],
-      Frequency : frequency[personalData.frequency],
-      Age : personalData.age,
-      Goal : goal[personalData.goal],
-      Height : personalData.height,
-      Weight : personalData.weight,
-      APreviousDayCompletion : 
-      WeekAbsTargetData[0] !== 0 ? WeekAbsTrainingData[0] / WeekAbsTargetData[0] : 0,
-      AWeeklyCompletion : 
-      sum(WeekAbsTargetData) !== 0 ? sum(WeekAbsTrainingData) / sum(WeekAbsTargetData) : 0,
-      APreviousDayTarget : WeekAbsTargetData[0],
-      LPreviousDayCompletion :
-      WeekLegTargetData[0] !== 0 ? WeekLegTrainingData[0] / WeekLegTargetData[0] : 0,
-      LWeeklyCompletion : 
-      sum(WeekLegTargetData) !== 0 ? sum(WeekLegTrainingData) / sum(WeekLegTargetData) : 0,
-      LPreviousDayTarget : WeekLegTargetData[0],
-      PPreviousDayCompletion :
-      WeekPectoralTargetData[0] !== 0 ? WeekPectoralTrainingData[0] / WeekPectoralTargetData[0] : 0,
-      PWeeklyCompletion :
-      sum(WeekPectoralTargetData) !== 0 ? sum(WeekPectoralTrainingData) / sum(WeekPectoralTargetData) : 0,
-      PPreviousDayTarget : WeekPectoralTargetData[0],
-    }
-
-    const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
-
-    parsonSelection(sendData).then(result => {
-      console.log(result)
-    }).catch(error => {
-      console.log(error)
-    })
-
-    const data = {
-      target : {
-        AbsTraining : 0,
-        LegTraining : 0,
-        PectoralTraining : 0,
-      },
-      training : {
-        AbsTraining : 0,
-        LegTraining : 0,
-        PectoralTraining : 0,
-      },
-      totalTime : {
-        AbsTraining : 0,
-        LegTraining : 0,
-        PectoralTraining : 0
-      }
-    }
-
-    
-
-    // result.TrainingData[Today] = data;
-
-    // setUserTrainingData(result.TrainingData)
-    // setDoc(doc(collection(db,"TrainingData"), userId), {
-    //   TrainingData : result.TrainingData,
-    //   personalData : result.personalData
-    // })
-  
-  }
 
   useEffect(() => {
+
+    const parsonSelection = async (data, result) => {
+      // 目標BMIに基づく理想体重の算出
+    
+      const url = "https://vol9-hackathon-predictionapi.onrender.com/target/"
+      fetch(url, {
+        method : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "accept" : "application/json"
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body : JSON.stringify(data),
+      }).then(response => response.json()).then((response) => {
+        console.log(response)
+    
+        const data = {
+          target : {
+            AbsTraining : response.AbsTraining,
+            LegTraining : response.LegTraining,
+            PectoralTraining : response.PectoralTraining,
+          },
+          training : {
+            AbsTraining : 0,
+            LegTraining : 0,
+            PectoralTraining : 0,
+          },
+          totalTime : {
+            AbsTraining : 0,
+            LegTraining : 0,
+            PectoralTraining : 0
+          }
+        }
+    
+        result.TrainingData[Today] = data;
+        setUserTrainingData(result)
+        console.log(result)
+        setDoc(doc(collection(db,"TrainingData"), userId), {
+          TrainingData : result.TrainingData,
+          personalData : result.personalData
+        }).catch(error => {
+          console.log(error)
+        })
+        
+      })
+    
+      // 新しいデータの構築
+      // const new_data = new Float32Array([mappedGender, mappedFrequency, Age, mappedGoal, Height, Weight, idealWeight, APreviousDayCompletion, AWeeklyCompletion, APreviousDayTarget, LPreviousDayCompletion, LWeeklyCompletion, LPreviousDayTarget, PPreviousDayCompletion, PWeeklyCompletion, PPreviousDayTarget]);
+    
+      // 予測＆格納
+    
+    }
+
+    const createMenu = async (result, userId) => {
+      const personalData = result.personalData;
+      const trainingData = result.TrainingData;
+      var i = 0;
+    
+      /**直近7日間のトレーニングデータを取得し、各種目ごとに配列で整形 */
+      let WeekAbsTrainingData = [];
+      let WeekLegTrainingData = [];
+      let WeekPectoralTrainingData = [];
+      // let TodayTrainingData = trainingData[dayjs().format("YYYY/MM/DD")]["training"];
+      let TodayTrainingData;
+      for (i = 0; i < 7; i++) {
+          if (trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
+              TodayTrainingData = trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["training"];
+              WeekAbsTrainingData.push(TodayTrainingData["AbsTraining"]);
+              WeekLegTrainingData.push(TodayTrainingData["LegTraining"]);
+              WeekPectoralTrainingData.push(TodayTrainingData["PectoralTraining"]);
+          } else {
+              WeekAbsTrainingData.push(0);
+              WeekLegTrainingData.push(0);
+              WeekPectoralTrainingData.push(0);
+          }
+      }
+    
+      // 直近7日間の目標回数を取得し、各種目ごとに配列に整形
+      let WeekAbsTargetData = [];
+      let WeekLegTargetData = [];
+      let WeekPectoralTargetData = [];
+      // let TodayTargetData = trainingData[dayjs().format("YYYY/MM/DD")]["target"];
+      let TodayTargetData;
+
+      for (i = 0; i < 7; i++) {
+          if (trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")] !== undefined) {
+              TodayTargetData = trainingData[dayjs().add(-i, "day").format("YYYY/MM/DD")]["target"];
+              WeekAbsTargetData.push(TodayTargetData["AbsTraining"]);
+              WeekLegTargetData.push(TodayTargetData["LegTraining"]);
+              WeekPectoralTargetData.push(TodayTargetData["PectoralTraining"]);
+          } else {
+              WeekAbsTargetData.push(0);
+              WeekLegTargetData.push(0);
+              WeekPectoralTargetData.push(0);
+          }
+      }
+    
+    
+      const sendData = {
+        Gender : gender[personalData.gender],
+        Frequency : frequency[personalData.frequency],
+        Age : personalData.age,
+        Goal : goal[personalData.goal],
+        Height : personalData.height,
+        Weight : personalData.weight,
+        APreviousDayCompletion : 
+        WeekAbsTargetData[0] !== 0 ? WeekAbsTrainingData[0] / WeekAbsTargetData[0] : 0,
+        AWeeklyCompletion : 
+        sum(WeekAbsTargetData) !== 0 ? sum(WeekAbsTrainingData) / sum(WeekAbsTargetData) : 0,
+        APreviousDayTarget : WeekAbsTargetData[0],
+        LPreviousDayCompletion :
+        WeekLegTargetData[0] !== 0 ? WeekLegTrainingData[0] / WeekLegTargetData[0] : 0,
+        LWeeklyCompletion : 
+        sum(WeekLegTargetData) !== 0 ? sum(WeekLegTrainingData) / sum(WeekLegTargetData) : 0,
+        LPreviousDayTarget : WeekLegTargetData[0],
+        PPreviousDayCompletion :
+        WeekPectoralTargetData[0] !== 0 ? WeekPectoralTrainingData[0] / WeekPectoralTargetData[0] : 0,
+        PWeeklyCompletion :
+        sum(WeekPectoralTargetData) !== 0 ? sum(WeekPectoralTrainingData) / sum(WeekPectoralTargetData) : 0,
+        PPreviousDayTarget : WeekPectoralTargetData[0],
+      }
+  
+      parsonSelection(sendData, result)
+    
+    }
 
     setUserId(user !== null ? user.uid : "");
 
@@ -173,15 +202,15 @@ function App() {
         }
 
         else if (result.TrainingData[Today] === undefined) {
-          result.TrainingData[Today] = createTrainingMenu(result.TrainingData);
-          // result.TrainingData[Today] = await createMenu(result)
-          setUserTrainingData(result)
-          setDoc(doc(collection(db,"TrainingData"), userId), {
-            TrainingData : result.TrainingData,
-            personalData : result.personalData
-          })
-        }else{
+          // result.TrainingData[Today] = createTrainingMenu(result.TrainingData);
           createMenu(result)
+          // setUserTrainingData(result)
+          // setDoc(doc(collection(db,"TrainingData"), userId), {
+          //   TrainingData : result.TrainingData,
+          //   personalData : result.personalData
+          // })
+        }else{
+          // createMenu(result)
           setUserTrainingData(result)
         }
       })
@@ -210,14 +239,16 @@ function App() {
   /* ローディング後かつログインしている時 ---------------------------------------------------- */
   else{
 
-    if (isEmpty(userTrainingData)){
+    console.log(firstFlag)
+
+    if (isEmpty(userTrainingData) && !firstFlag){
       return (<Loading></Loading>)
     }
 
     return (
     <>
     <BrowserRouter>
-      <HamburgerMenu />
+      {parentStyle ? <></> : <HamburgerMenu /> }
       <div className='App'>
         <Sidebar />
         <Switch>
@@ -242,164 +273,16 @@ function App() {
 
           <Route path='/training'>
             {/* <LiveCamera /> */}
-            < PoseDetection userTrainingData={userTrainingData.TrainingData} userId={userId}/>
+            < PoseDetection userTrainingData={userTrainingData.TrainingData} userId={userId} onChangeStyle={handleStyleChange} />
           </Route>
           
         </Switch>
       </div>
-      <FooterMenu />
+      {parentStyle ? <></> : <FooterMenu />}
     </BrowserRouter>
     </>
   );}
 }
-
-
-const parsonSelection = async (data, session) => {
-  // 目標BMIに基づく理想体重の算出
-  const goal_bmi = {
-      "Male": { "MuscleStrength": 25.0, "WeightLoss": 22.0, "HealthMaintenance": 24.0 },
-      "Female": { "MuscleStrength": 23.0, "WeightLoss": 20.0, "HealthMaintenance": 22.0 }
-  };
-
-  // 辞書から必要な情報を取得
-  const Gender = data["Gender"];
-  const Frequency = data["Frequency"];
-  const Age = parseInt(data["Age"]);
-  const Goal = data["Goal"];
-  const Height = parseInt(data["Height"]);
-  const Weight = parseFloat(data["Weight"]);
-
-  // 目標BMIから理想体重を計算
-  const ideal_bmi = goal_bmi[Gender][Goal];
-  const idealWeight = Math.round(ideal_bmi * (Height / 100) ** 2, 1);
-
-  // 文字列を数値に置換
-  const gender_mapping = { "Male": 1, "Female": 2, "Other": 3 };
-  const goal_mapping = { "MuscleStrength": 1, "WeightLoss": 2, "HealthMaintenance": 3 };
-  const frequency_mapping = { "Low": 1, "Moderate": 2, "High": 3 };
-  const mappedGender = gender_mapping[Gender] || Gender;
-  const mappedGoal = goal_mapping[Goal] || Goal;
-  const mappedFrequency = frequency_mapping[Frequency] || Frequency;
-
-  // 部位ごとの目標回数を格納するオブジェクト
-  const TargetRepsDict = {};
-
-  // ALPを数値に変換
-  const APreviousDayCompletion = parseFloat(data["APreviousDayCompletion"]);
-  const AWeeklyCompletion = parseFloat(data["AWeeklyCompletion"]);
-  const APreviousDayTarget = parseFloat(data["APreviousDayTarget"]);
-  const LPreviousDayCompletion = parseFloat(data["LPreviousDayCompletion"]);
-  const LWeeklyCompletion = parseFloat(data["LWeeklyCompletion"]);
-  const LPreviousDayTarget = parseFloat(data["LPreviousDayTarget"]);
-  const PPreviousDayCompletion = parseFloat(data["PPreviousDayCompletion"]);
-  const PWeeklyCompletion = parseFloat(data["PWeeklyCompletion"]);
-  const PPreviousDayTarget = parseFloat(data["PPreviousDayTarget"]);
-
-  // 新しいデータの構築
-  const new_data = new Float32Array([mappedGender, mappedFrequency, Age, mappedGoal, Height, Weight, idealWeight, APreviousDayCompletion, AWeeklyCompletion, APreviousDayTarget, LPreviousDayCompletion, LWeeklyCompletion, LPreviousDayTarget, PPreviousDayCompletion, PWeeklyCompletion, PPreviousDayTarget]);
-
-  // 予測＆格納
-  // const keys = ["A", "L", "P"];
-  const keys = ["A"]
-
-  const modelFile = `./models/userInfo_Amodel.onnx`;
-  // if (typeof fetch !== 'undefined') {
-  //   const response = await fetch(modelFile);
-  //   const buffer = await response.arrayBuffer();
-  //   console.log(buffer)
-  //   const option =  {executionProviders: ['webgl']};
-
-  //   try {
-  //     const session = await InferenceSession.create(buffer, option); // データのArrayBufferとオプションを指定
-  //     console.log(session.inputNames, session.outputNames);
-
-  //   }
-  //   catch(e) {
-  //     console.log(e)
-  //   }
-  // }
-
-
-
-  // const option =  {executionProviders: ['webgl']};
-  // for (const key of keys) {
-  //     // ONNXモデルのダウンロード
-  //     // const path = "src/models/userInfo_Amodel.onnx"
-  //     const modelFile = `./models/userInfo_${key}model.onnx`;
-
-  //     const session = await InferenceSession.create('model.onnx', option);
-
-  //   // ONNXモデルの読み込み
-  //     session.loadModel(modelFile).then(() => {
-  //       // 推論のための入力データの作成
-    
-  //       const inputTensor = new Tensor('float32', new_data, [1,16 /* input shape dimensions here */]);
-
-  //       // 推論の実行
-  //       const outputMap = session.run([inputTensor]);
-
-  //       // 推論結果の処理
-  //       const outputTensor = outputMap.values().next().value;
-  //       const outputData = outputTensor.data;
-  //       console.log('Output:', outputData);
-  //     }).catch((error) => {
-  //       console.error('Error loading the ONNX model:', error);
-  //     });
-  //     // const modelResponse = await fetch(modelFile);
-  //     // const modelBuffer = await modelResponse.arrayBuffer();
-      // const modelData = new Uint8Array(modelBuffer);
-
-      // console.log(modelBuffer)
-
-      // ONNXモデルのセッションの初期化
-      // const session = new InferenceSession({ backendHint: 'webgl' });
-      // const session = new InferenceSession()
-      // await session.loadModel("./models/userInfo_Pmodel.onnx");
-      // console.log("Ok")
-      // const inputs = [
-      //   new Tensor(new_data, "float32", [1,16]),
-      // ];
-
-      // const outputMap = await session.run(inputs);
-      // const outputTensor = outputMap.values().next().value;
-      // console.log(outputTensor)
-
-
-      // await session.loadModel(modelData);
-
-      // await session.loadModel(modelFile);
-
-      // const inputTensor = new Tensor(new_data, 'float32', [1, 16]);
-      // const res = await session.run([inputTensor]);
-
-      // console.log(res)
-      
-
-      // エラー発生個所
-      // session.loadModel(modelFile).then(() => {
-      //   const inputTensor = new Tensor(new_data, 'float32', [1, 16]);
-      // // 推論の実行
-      //   session.run([inputTensor])
-      //   .then((outputData) => {
-      //     console.log(outputData)
-      //     return outputData
-      //   })
-      // }).catch(error => {
-      //   console.log(error)
-      // })
-  
-      // 入力データのTensorの作成
-      
-
-      // 推論結果を格納
-      // const category_mapping = { "A": "AbsTraining", "L": "LegTraining", "P": "PectoralTraining" };
-      // TargetRepsDict[category_mapping[key]] = outputData.values().next().value.data[0];
-  // }
-  // return TargetRepsDict;
-}
-
-// テストの実行
-// parsonSelection(sendData).then(result => console.log(result));
 
 
 

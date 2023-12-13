@@ -1,15 +1,15 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import macho from "../../images/macho.png";
 import TrainingMenu from './TrainingMenu';
-import { collection, updateDoc, doc,} from "firebase/firestore";
+import { collection, doc, setDoc} from "firebase/firestore";
 import { db } from '../..';
 import dayjs from "dayjs";
 import { goalToNum, goal, gender, frequency } from '../utility/utilitys';
 
 function Home(props) {
 
-  const { userTrainingData, firstFlag, userId } = props;
-  const [ testFlag, setTestFlag ] = useState(true);
+  const { userTrainingData, firstFlag, userId} = props;
+  const [ testFlag, setTestFlag ] = useState(firstFlag);
   const genderRef = useRef(null);
   const trainingRef = useRef(null);
   const targetRef = useRef(null);
@@ -17,46 +17,63 @@ function Home(props) {
   const heightRef = useRef(null);
   const weightRef = useRef(null);
 
-  let trainingData = userTrainingData;
+  let trainingData;
+
+  useEffect(() => {
+    if (!testFlag) {
+      trainingData = userTrainingData;
+    }
+  })
 
   const createMenu =  async(sendData, personalData) => {
 
-    const url = "https://example.com";
-    const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
-  
-    fetch(url, {
-      method: "GET",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sendData
-      }),
-    }).then(response => response.json()).then((result) => {
+    console.log(sendData, personalData)
 
+    const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
+
+    const url = "https://vol9-hackathon-predictionapi.onrender.com/target/"
+    fetch(url, {
+      method : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "accept" : "application/json"
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body : JSON.stringify(sendData),
+    }).then(response => response.json()).then((response) => {
+      console.log(response)
+      
       const data = {
-        [Today] : {
-          target : result,
-          training : {
-            AbsTraining : 0,
-            LegTraining : 0,
-            PectoralTraining : 0,
-          },
-          totalTime : {
-            AbsTraining : 0,
-            LegTraining : 0,
-            PectoralTraining : 0
-          }
+        target : {
+          AbsTraining : response.AbsTraining,
+          LegTraining : response.LegTraining,
+          PectoralTraining : response.PectoralTraining,
+        },
+        training : {
+          AbsTraining : 0,
+          LegTraining : 0,
+          PectoralTraining : 0,
+        },
+        totalTime : {
+          AbsTraining : 0,
+          LegTraining : 0,
+          PectoralTraining : 0
         }
       }
 
-      updateDoc(doc(db, "TrainingData", userId), {
-        TrainingData : data,
+      setDoc(doc(collection(db, "TrainingData"), userId), {
+        TrainingData : {
+          [Today] : data
+        },
         personalData : personalData,
       })
 
-      return data;
+      trainingData = { [Today] : data }
+
+    }).then(() => {
+      setTestFlag(false)
     })
+
   }
 
 
@@ -90,6 +107,8 @@ function Home(props) {
       goal   : targetRef.current.value
     }
 
+    console.log(personalData)
+
     const sendData = {
       Gender : gender[genderRef.current.value],
       Frequency : frequency[trainingRef.current.value],
@@ -108,21 +127,27 @@ function Home(props) {
       PPreviousDayTarget : 0,
     }
 
-    // trainingData = await createMenu(sendData);
-    trainingData = userTrainingData;
-    console.log(trainingData)
-    updateDoc(doc(db, "TrainingData", userId), {
-      personalData : personalData,
+    // trainingData = userTrainingData;
+    // console.log(trainingData)
+    // updateDoc(doc(collection(db, "TrainingData"), userId), {
+    //   personalData : personalData,
+    // })
+    // setTestFlag(false);
+
+    await createMenu(sendData, personalData).catch((error) => {
+      console.log(error)
     })
-    setTestFlag(false);
+
   }
+
+  console.log("OK?")
 
   return (
     // {firstFlag ? <InitSetting /> :<TrainingMenu userTrainingData={userTrainingData}/>}
     <div className='Main'>
 
     {/* { testFlag && trainingData === userTrainingData ?  */}
-    { firstFlag && trainingData === userTrainingData ? 
+    { testFlag ? 
       <div className='Form'>
         <form className='wrap'>
         <h2>あなたの事を教えて下さい</h2>
@@ -156,7 +181,7 @@ function Home(props) {
                 <option value={"健康維持"}>健康維持</option>
             </select>
 
-            <button className='LoginButton' type='submit' onClick={initSetting}> メニュー生成</button>
+            <button className='LoginButton' type='button' onClick={initSetting}> メニュー生成</button>
         </form>
       </div>
       : 
@@ -168,7 +193,7 @@ function Home(props) {
           ボタンを押すとカメラが起動し、<br></br>計測が開始されます。
         </p>
       
-      <TrainingMenu userTrainingData={trainingData}/>
+      <TrainingMenu userTrainingData={userTrainingData}/>
     
     
     </div>}

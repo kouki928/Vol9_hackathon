@@ -13,6 +13,7 @@ import { Camera } from "@mediapipe/camera_utils";
 import { drawConnectors, drawLandmarks, clamp } from "@mediapipe/drawing_utils";
 import { Pose, POSE_CONNECTIONS, POSE_LANDMARKS_LEFT, POSE_LANDMARKS_NEUTRAL, POSE_LANDMARKS_RIGHT } from "@mediapipe/pose/pose";
 import { transform } from 'typescript';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 /** PoseDetection ----------------------------------------------------------
 * Componentクラスを継承したクラス。クラスである意味は特になく、検索結果の産物
@@ -22,15 +23,16 @@ import { transform } from 'typescript';
 class PoseDetection extends Component {
 
   // ここでuseContextを使えるようにしている。
-  static contextType = useContext;
+  static contextType = GlobalContext;
 
   // Pythonでいう init のようなもの。this. = self. くらいの認識
   constructor(props) {
     super(props);
     this.videoRef = React.createRef();
     this.canvasRef = React.createRef();
-    // this.width = window.innerWidth > 900 ? 640 : 320;
-    // this.height = window.innerWidth > 900 ? 480 : 240;
+    // this.testCanvasRef = React.createRef();
+    this.testwidth = window.innerWidth > 900 ? 640 : 320;
+    this.testheight = window.innerWidth > 900 ? 480 : 240;
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     this.trainingType = new URL(decodeURI(window.location.href)).searchParams.get("classification");
@@ -63,30 +65,63 @@ class PoseDetection extends Component {
     const video5 = this.videoRef.current;
     // canvas Element
     const out5 = this.canvasRef.current;
+    // const testCTX = this.testCanvasRef.current.getContext("2d");
+    // testCTX.scale(-1,1)
     out5.style.transform = "scaleX(-1)";
     const canvasCtx5 = out5.getContext('2d');
     // canvasCtx5.rotate((90 * Math.PI) / 180)
     const userTrainingData = this.props.userTrainingData
-
     const Today = dayjs().format("YYYY/MM/DD") // 今日の日付
-
     const trainingType = this.trainingType
+
+    this.props.onChangeStyle(true);
+
+
+    /** 画角メモ
+     * 1. 縦横比率を計算する 
+     * 2. 計算結果に基づいて、縦 or 横に合わせて画面を切り取る。
+     * 3. 切り取ったモノをcanvasサイズに拡大する
+     * 
+     * canvas のサイズは画面いっぱい広がっているものとする。
+     * 縦4,横2の画面、 縦2, 横3のカメラがあったとする。縦に合わせたいから、縦で比率を計算する。
+     * 2 / 4 = 0.75 0.5倍にすればよいことが分かった。縦は videoのサイズ 2に 横は 縦横比を維持するために、canvas横に0.5かけて 1
+     * カメラから 縦2, 横1 の画面を切り取る。3/2 = 1.5 - 0.5 = 1  1+1で2なので、 1 ~ 2の横と 縦 2を撮る。
+     * これを canvas のサイズに拡大して張り付けて終了
+     */
+    
 
 
     // 描写のためのカメラ調整パラメータ
     // カメラサイズ / 2 - 描写したいサイズ /2
     const cx = window.innerWidth;
     const cy = window.innerHeight;
-    const sx = this.trainingType === "LegTraining" ? cx / 2 : 0
-    const sy = this.trainingType === "LegTraining" ? 0 : 0
-    const sWidth = this.trainingType === "LegTraining" ? window.innerWidth : window.innerWidth;
-    const sHeight = this.trainingType === "LegTraining" ? out5.height : out5.height
+    const rate = this.trainingType === "LegTraining" ? video5.height / cy : video5.width / cx // カメラとcanvasの比率
+    const gap = this.trainingType  === "LegTraining" ? rate * cx : rate * cy// 最大を取らない方の幅
+    const sx = this.trainingType   === "LegTraining" ? video5.width / 2 - gap / 2 : 0;
+    const sy = this.trainingType   === "LegTraining" ? 0 : video5.width / 2 - gap / 2;
+    const sWidth = this.trainingType  === "LegTraining" ? gap : video5.width;
+    const sHeight = this.trainingType === "LegTraining" ? video5.height : gap
     const dx = this.trainingType === "LegTraining" ? 0 : 0
     const dy = this.trainingType === "LegTraining" ? 0 : 0
-    const dWidth = this.trainingType === "LegTraining" ? window.innerWidth : window.innerWidth;
-    const dHeight = this.trainingType === "LegTraining" ? window.innerHeight : window.innerHeight;
+    const dWidth = this.trainingType  === "LegTraining" ? cx : cx
+    const dHeight = this.trainingType === "LegTraining" ? cy : cy;
 
-    console.log(out5.height, out5.width)
+    console.log({
+      videoW : video5.width,
+      videoH : video5.height,
+      cx : cx,
+      cy : cy,
+      rate : rate,
+      gap : gap,
+      sx : sx,
+      sy : sy,
+      sWidth : sWidth,
+      sHeight : sHeight,
+      dx : dx,
+      dy : dy,
+      dWidth : dWidth,
+      dHeight : dHeight
+    })
     /**calculateAngleWithin180 --------------------------------------------------------------------------
    * webカメラから得た座標情報を基に角度を計算する関数。
    --------------------------------------------------------------------------------------------------*/
@@ -361,14 +396,14 @@ class PoseDetection extends Component {
 
       function onResultsPose(results) { // ポーズ検出の結果を処理する関数
 
-        // console.log(results)
-
         canvasCtx5.save(); // キャンバスの状態を保存
         canvasCtx5.clearRect(0, 0, video5.width, video5.height); // キャンバスをクリア
 
-        if (trainingType !== "LegTraining") {
-          // canvasCtx5.rotate(-90)
-        }
+        // if (trainingType !== "LegTraining") {
+        //   // canvasCtx5.rotate(-90)
+        // }
+
+        // const Image = results.image.getImageData()
 
         canvasCtx5.drawImage(results.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight, ); // 画像を描画
         // canvasCtx5.drawImage(results.image, 0, 0, out5.width, out5.height, ); // 画像を描画
@@ -422,6 +457,9 @@ class PoseDetection extends Component {
         );
 
         canvasCtx5.restore(); // キャンバスの状態を復元
+
+        // fix
+        // testCTX.restore();
       }
 
       // MediaPipe Pose モデルの設定
@@ -437,8 +475,8 @@ class PoseDetection extends Component {
         onFrame: async () => {
           await pose.send({ image: video5 });
         }, // カメラのフレーム受け取り時にポーズ検出を行う設定
-        width: 600, // カメラの幅
-        height: 480 // カメラの高さ
+        width: window.innerWidth, // カメラの幅
+        height: window.innerWidth / 4 * 3 // カメラの高さ
       });
       camera.start(); // カメラを起動
       // ストップウォッチを開始
@@ -465,13 +503,18 @@ class PoseDetection extends Component {
     const userId = this.props.userId
     const cx = window.innerWidth > 900 ? window.innerWidth - 250 : window.innerWidth;
     const cy = window.innerWidth > 900 ? window.innerHeight : window.innerHeight - 91.8;
-  
+    
+    const width = window.innerWidth;
+    const height = width / 4 * 3
+
     
     return (
       <div className='Main'>
         <div className='CameraWrapper'>
           <canvas ref={this.canvasRef} width={cx} height={cy} className='canvas' />
-          <video ref={this.videoRef} autoPlay playsInline width={cx} height={cy} />
+          <video ref={this.videoRef} autoPlay playsInline width={width} height={height} />
+
+          {/* <canvas ref={this.testCanvasRef} width={this.testwidth} height={this.testheight} className='canvas' /> */}
 
           <div className='TrainingCounter'>
             <div className='CounterHeader'>
@@ -492,6 +535,7 @@ class PoseDetection extends Component {
 
               // localStorage.setItem("userTrainingData", JSON.stringify(userTrainingData))
               await updateDoc(doc(collection(db, "TrainingData"), userId), { TrainingData: userTrainingData });
+              this.props.onChangeStyle(false);
               window.location.href = "/"
             }
           }>{this.state.buttonText}</div>

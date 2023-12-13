@@ -13,11 +13,13 @@ const MySwal = withReactContent(Swal)
 
 function TrainingMenu(props) {
 
-  const { userTrainingData } = props;
+  const { userTrainingData, handleStyleChange } = props;
 
   const { setTrainingType, userId } = useContext(GlobalContext);
 
   const Today = dayjs().format("YYYY/MM/DD");
+
+  // console.log(userTrainingData)
 
   const todayData = userTrainingData[Today]
   const Menu = [
