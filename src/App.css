@@ -685,6 +685,10 @@ progress {
     margin-left: 10px;
   }
 
+  .headerTitle {
+    padding-top: 7px;
+  }
+
   .header .headerIcon {
     margin-left: 20px;
   }

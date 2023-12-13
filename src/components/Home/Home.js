@@ -153,6 +153,7 @@ function Home(props) {
       cancelButtonColor: "#d33",
       cancelButtonText : "戻る",
       confirmButtonText: "開始"
+      
     }).then((result) => {
       if (result.isConfirmed) {
 
