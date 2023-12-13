@@ -103,6 +103,9 @@ function UserPage(props) {
     return (
 
         <div className='Main'>
+            <div className='formWrapper'>
+
+            
             <h2 style={topStyle}>ユーザ情報を変更できます。</h2>
             <div style={inputLabelStyle}>
                 <label className='InputLabel' style={inputFont}>身長 : </label>
@@ -167,6 +170,7 @@ function UserPage(props) {
             <button className='LoginButton' type='submit' onClick={savePersonalData} style={buttonStyle}>
                 設定
             </button>
+            </div>
         </div>
     )
 }
