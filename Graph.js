@@ -201,19 +201,8 @@ function Graph(props) {
         const currentWeight = weights[dayjs().subtract(i, 'day').format('YYYY/MM/DD')];
         if (currentWeight !== undefined) {
             WeekWeightData.push(Math.round(currentWeight));
-        } else if (lastValidWeight !== null) {
-            WeekWeightData.push(Math.round(lastValidWeight)); // データがない場合は最新の有効な値で補完
         } else {
-            let j = 1;
-            while (true) {
-                const previousWeight = weights[dayjs().subtract(i + j, 'day').format('YYYY/MM/DD')];
-                if (previousWeight !== undefined) {
-                    WeekWeightData.push(Math.round(previousWeight));
-                    lastValidWeight = previousWeight; // 補完した値を最新の有効な値として更新
-                    break;
-                }
-                j++;
-            }
+            WeekWeightData.push(Math.round(weight));
         }
     }
     WeekWeightData.reverse();
