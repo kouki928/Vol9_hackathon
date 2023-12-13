@@ -9,6 +9,14 @@ import dayjs from 'dayjs';
 import { collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../index';
 
+
+// 追加 ----------------------------------------------------------------------------------
+import Up from "../../images/Up.png";
+import Down from "../../images/Down.png";
+import macho from "../../images/macho.png";
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 import { Camera } from "@mediapipe/camera_utils";
 import { drawConnectors, drawLandmarks, clamp } from "@mediapipe/drawing_utils";
 import { Pose, POSE_CONNECTIONS, POSE_LANDMARKS_LEFT, POSE_LANDMARKS_NEUTRAL, POSE_LANDMARKS_RIGHT } from "@mediapipe/pose/pose";
@@ -76,13 +84,27 @@ class PoseDetection extends Component {
 
     this.props.onChangeStyle(true);
 
-    // canvasCtx5.fillStyle = 'blue';
-    // canvasCtx5.fillRect(50, 50, 100, 50);
 
-    // // ボタン上にテキストを描画
-    // canvasCtx5.fillStyle = 'white';
-    // canvasCtx5.font = '20px Arial';
-    // canvasCtx5.fillText('Click me', 70, 80);
+
+
+    // この辺の宣言 -----------------------------------------------------------------------------------------
+
+
+    let back_image = false;
+
+    // 画像を宣言
+    
+    const udImage = new Image();
+    udImage.className = "udImage"
+
+
+
+    udImage.onload = () => {
+      canvasCtx5.scale(-1,1)
+      canvasCtx5.drawImage(udImage, 0,0 , 70, 70)
+      canvasCtx5.scale(-1,1)
+
+    }
 
 
     /** 画角メモ
@@ -339,16 +361,33 @@ class PoseDetection extends Component {
       canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       canvasCtx5.font = "60px Arial"; // フォントサイズと種類
       canvasCtx5.fillText(`Angle: ${this.angle}°`, -630, 50); // 角度を描画
+
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      ///
+      /// ここのif文 ----------------------------------------------------------
+      ///
+      ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
       if (this.flag === true) {
-        canvasCtx5.fillStyle = "#0000FF"; // 青色のフォント
-        canvasCtx5.font = "80px Arial"; // フォントサイズと種類
-        canvasCtx5.fillText(`⇩`, -200, 50); // 指示を描画
-        canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
+
+        if (back_image !== this.flag){
+          udImage.src = Down
+        }
+        // canvasCtx5.fillStyle = "#0000FF"; // 青色のフォント
+        // canvasCtx5.font = "80px Arial"; // フォントサイズと種類
+        // canvasCtx5.fillText(`⇩`, -200, 50); // 指示を描画
+        // canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       } else {
-        canvasCtx5.fillStyle = "#FF⇩⇩0000"; // 赤色のフォント
-        canvasCtx5.font = "80px Arial"; // フォントサイズと種類
-        canvasCtx5.fillText(`⇧`, -150, 50); // 指示を描画
-        canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
+
+        if (back_image !== this.flag){
+          udImage.src = Up
+        }
+        // canvasCtx5.fillStyle = "#FF⇩⇩0000"; // 赤色のフォント
+        // canvasCtx5.font = "80px Arial"; // フォントサイズと種類
+        // canvasCtx5.fillText(`⇧`, -150, 50); // 指示を描画
+        // canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       }
       canvasCtx5.font = "70px Arial"; // フォントサイズと種類
       canvasCtx5.fillText(`残り ${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count} 回`, -630, 470);

@@ -473,6 +473,15 @@ video {
   background-color: var(--color0);
 }
 
+.udImage {
+  position: absolute;
+  top: 140px;
+  right: 40px;
+  z-index: 120;
+  width: 120px;
+  height: 120px;
+}
+
 
 /* カレンダー ---------------------------------------------------------------- */
 
