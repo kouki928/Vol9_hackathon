@@ -33,7 +33,9 @@ ChartJS.register(
 
 function Graph(props) {
 
-    const { userTrainingData } = props;
+    const { userTrainingData, personalData } = props;
+
+    const weight = personalData.weight;
 
     // デイリー達成率グラフのオプション
     const RateOption = {

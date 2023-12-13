@@ -260,7 +260,7 @@ function App() {
           </Route>
           
           <Route path='/graph'>
-            <Graph userTrainingData={userTrainingData.TrainingData}/>
+            <Graph userTrainingData={userTrainingData.TrainingData} personalData={userTrainingData.personalData}/>
           </Route>
           
           <Route path="/setting">
