@@ -245,7 +245,7 @@
   margin: 1.5rem;
   display: block;
   width: 300px;
-  background-color: var(--color0);
+  background-color: var(--color1);
   border-radius: 6px;
 }
 
@@ -314,6 +314,7 @@ option {
 .LoginButton {
   /* margin-left: 1rem; */
   padding: 10px 15px;
+  margin: 15px;
   border-radius: 6px;
   background-color: var(--color0);
 }
@@ -606,11 +607,13 @@ progress {
 
 .UserId {
   margin: 0 30px;
+  font-family: "Noto Sans CJK JP";
+  font-size: 16.54px;
 }
 
 .Pointdiscription {
-  margin: 0 30px;
-  text-align: left;
+  margin-bottom: 10px;
+  text-align: center;
 }
 
 .CouponBoxWrapper {
@@ -623,7 +626,7 @@ progress {
   width: calc(100% / 2 - 10%);
   padding: 12px;
   margin: 12px auto;
-  border: var(--color0) solid 0.5px;
+  border: var(--color0) solid 1.5px;
   border-radius: 6px;
 }
 
@@ -742,7 +745,6 @@ progress {
     /* background-color: rgb(243, 242, 242); */
     background-color: var(--color0);
     color: white;
-    border-top: 1px solid #acacac;
     position: fixed;
     left: 0;
     bottom: 0;
