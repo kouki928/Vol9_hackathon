@@ -1,14 +1,15 @@
 import React, {useRef, useState, useEffect} from 'react';
 import macho from "../../images/macho.png";
 import TrainingMenu from './TrainingMenu';
-import { collection, doc, setDoc} from "firebase/firestore";
+import { collection, doc, setDoc, updateDoc} from "firebase/firestore";
 import { db } from '../..';
 import dayjs from "dayjs";
 import { goalToNum, goal, gender, frequency } from '../utility/utilitys';
+import { Today } from '@mui/icons-material';
 
 function Home(props) {
 
-  const { userTrainingData, firstFlag, userId} = props;
+  const { userTrainingData, firstFlag, userId, personalData, weights} = props;
   const [ testFlag, setTestFlag ] = useState(firstFlag);
   const genderRef = useRef(null);
   const trainingRef = useRef(null);
@@ -140,6 +141,28 @@ function Home(props) {
 
   }
 
+  const getWeight = async () => {
+    const ip = "192.168.132.11"
+    const url = `http://${ip}:8000/`
+
+    fetch(url, {
+        method : "GET",
+        credentials: 'include',
+    }).then(response => response.json()).then(response => {
+        const weight = response.weight;
+        personalData.weight = weight;
+        weights[Today] = weight
+
+        updateDoc(doc(collection(db, "TrainingData"), userId), {
+          personalData : personalData,
+          weights : weights
+        })
+
+    }).catch(e => {
+        console.log(e)
+    })
+  }
+
   console.log("OK?")
 
   return (
@@ -194,7 +217,8 @@ function Home(props) {
         </p>
       
       <TrainingMenu userTrainingData={userTrainingData}/>
-    
+      <button onClick={getWeight} className='LoginButton'>体重測定</button>
+
     
     </div>}
     </div>

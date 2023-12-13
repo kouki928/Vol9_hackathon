@@ -602,10 +602,10 @@ progress {
   padding: 15px;
 }
 
-.PointBoxWrapper {
+/* .PointBoxWrapper { */
   /* display: flex; */
   /* justify-content: left; */
-}
+/* } */
 
 .UserId {
   margin: 0 30px;
@@ -641,9 +641,9 @@ progress {
 
 
 @media screen and (max-width: 900px) {
-  .App {
+  /* .App {
     margin-bottom: 50px;
-  }
+  } */
 
   .Main {
     padding-left: 0;
@@ -821,6 +821,36 @@ progress {
 
   .formWrapper {
     margin-top: 62px;
+  }
+
+  .batsu{
+    font-size: 30px;/*ボタンの大きさ*/
+  
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+
+    border-radius: 100%;
+    width: 60px;
+    line-height: 60px;
+    cursor: pointer;
+    transition: .2s;
+    background: var(--color0);
+    border-color: white;
+    color: #FFF;
+  }
+      
+  .batsu:hover{
+    font-weight: bold;
+    border: 2px solid var(--color0);
+    color: var(--color0);
+    background-color: white;
+    font-weight: 900;
   }
 
 }

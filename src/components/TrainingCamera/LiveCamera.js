@@ -76,6 +76,14 @@ class PoseDetection extends Component {
 
     this.props.onChangeStyle(true);
 
+    // canvasCtx5.fillStyle = 'blue';
+    // canvasCtx5.fillRect(50, 50, 100, 50);
+
+    // // ボタン上にテキストを描画
+    // canvasCtx5.fillStyle = 'white';
+    // canvasCtx5.font = '20px Arial';
+    // canvasCtx5.fillText('Click me', 70, 80);
+
 
     /** 画角メモ
      * 1. 縦横比率を計算する 
@@ -98,7 +106,7 @@ class PoseDetection extends Component {
     const rate = this.trainingType === "LegTraining" ? video5.height / cy : video5.width / cx // カメラとcanvasの比率
     const gap = this.trainingType  === "LegTraining" ? rate * cx : rate * cy// 最大を取らない方の幅
     const sx = this.trainingType   === "LegTraining" ? video5.width / 2 - gap / 2 : 0;
-    const sy = this.trainingType   === "LegTraining" ? 0 : video5.width / 2 - gap / 2;
+    const sy = this.trainingType   === "LegTraining" ? 0 : video5.height / 2 - gap / 2;
     const sWidth = this.trainingType  === "LegTraining" ? gap : video5.width;
     const sHeight = this.trainingType === "LegTraining" ? video5.height : gap
     const dx = this.trainingType === "LegTraining" ? 0 : 0
@@ -333,13 +341,13 @@ class PoseDetection extends Component {
       canvasCtx5.fillText(`Angle: ${this.angle}°`, -630, 50); // 角度を描画
       if (this.flag === true) {
         canvasCtx5.fillStyle = "#0000FF"; // 青色のフォント
-        canvasCtx5.font = "60px Arial"; // フォントサイズと種類
-        canvasCtx5.fillText(`DOWN`, -200, 50); // 指示を描画
+        canvasCtx5.font = "80px Arial"; // フォントサイズと種類
+        canvasCtx5.fillText(`⇩`, -200, 50); // 指示を描画
         canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       } else {
-        canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
-        canvasCtx5.font = "60px Arial"; // フォントサイズと種類
-        canvasCtx5.fillText(`UP`, -150, 50); // 指示を描画
+        canvasCtx5.fillStyle = "#FF⇩⇩0000"; // 赤色のフォント
+        canvasCtx5.font = "80px Arial"; // フォントサイズと種類
+        canvasCtx5.fillText(`⇧`, -150, 50); // 指示を描画
         canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       }
       canvasCtx5.font = "70px Arial"; // フォントサイズと種類
@@ -391,13 +399,13 @@ class PoseDetection extends Component {
 
       function zColor(data) { // ポーズのz座標から色を生成する関数
         const z = clamp(data.from.z + 0.5, 0, 1);
-        return `rgba(0, ${255 * z}, ${255 * (1 - z)}, 1)`;
+        return `rgba(255, 49, 80, 1)`;
       }
 
       function onResultsPose(results) { // ポーズ検出の結果を処理する関数
 
         canvasCtx5.save(); // キャンバスの状態を保存
-        canvasCtx5.clearRect(0, 0, video5.width, video5.height); // キャンバスをクリア
+        canvasCtx5.clearRect(0, 0, canvasCtx5.width, canvasCtx5.height); // キャンバスをクリア
 
         // if (trainingType !== "LegTraining") {
         //   // canvasCtx5.rotate(-90)
@@ -429,9 +437,9 @@ class PoseDetection extends Component {
 
             const gradient = canvasCtx5.createLinearGradient(x0, y0, x1, y1);
             gradient.addColorStop(
-              0, `rgba(0, ${255 * z0}, ${255 * (1 - z0)}, 1)`);
+              0, `rgba(255, 132, 0)`);
             gradient.addColorStop(
-              1.0, `rgba(0, ${255 * z1}, ${255 * (1 - z1)}, 1)`);
+              1.0, `rgba(255, 160, 72)`);
             return gradient;
           }
         });
@@ -441,20 +449,23 @@ class PoseDetection extends Component {
           canvasCtx5,
           Object.values(POSE_LANDMARKS_LEFT)
             .map(index => results.poseLandmarks[index]),
-          { color: zColor, fillColor: '#FF0000' }
+          { color: zColor, fillColor: '#ffa048' }
         );
         drawLandmarks(
           canvasCtx5,
           Object.values(POSE_LANDMARKS_RIGHT)
             .map(index => results.poseLandmarks[index]),
-          { color: zColor, fillColor: '#00FF00' }
+          { color: zColor, fillColor: '#ffa048' }
         );
         drawLandmarks(
           canvasCtx5,
           Object.values(POSE_LANDMARKS_NEUTRAL)
             .map(index => results.poseLandmarks[index]),
-          { color: zColor, fillColor: '#AAAAAA' }
+          { color: zColor, fillColor: '#ffa048' }
         );
+
+
+        
 
         canvasCtx5.restore(); // キャンバスの状態を復元
 
@@ -511,12 +522,25 @@ class PoseDetection extends Component {
     return (
       <div className='Main'>
         <div className='CameraWrapper'>
+          <div className='batsu' onClick={
+            async () => {
+              userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType] = this.state.count
+              userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"][this.trainingType] = this.state.totalTime
+
+              // localStorage.setItem("userTrainingData", JSON.stringify(userTrainingData))
+              await updateDoc(doc(collection(db, "TrainingData"), userId), { TrainingData: userTrainingData });
+              this.props.onChangeStyle(false);
+              window.location.href = "/"
+            }
+          }>
+            ✕
+          </div>
           <canvas ref={this.canvasRef} width={cx} height={cy} className='canvas' />
           <video ref={this.videoRef} autoPlay playsInline width={width} height={height} />
 
           {/* <canvas ref={this.testCanvasRef} width={this.testwidth} height={this.testheight} className='canvas' /> */}
 
-          <div className='TrainingCounter'>
+          {/* <div className='TrainingCounter'>
             <div className='CounterHeader'>
               <h2>カウント</h2>
               <h2>目標</h2>
@@ -538,7 +562,7 @@ class PoseDetection extends Component {
               this.props.onChangeStyle(false);
               window.location.href = "/"
             }
-          }>{this.state.buttonText}</div>
+          }>{this.state.buttonText}</div> */}
         </div>
       </div>
     );

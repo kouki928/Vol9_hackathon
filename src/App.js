@@ -256,7 +256,8 @@ function App() {
         <Sidebar userId={userId}/>
         <Switch>
           <Route exact path="/">
-            <Home userTrainingData={userTrainingData.TrainingData} firstFlag={firstFlag} userId={userId} />
+            <Home userTrainingData={userTrainingData.TrainingData} firstFlag={firstFlag} userId={userId}
+            personalData={userTrainingData.personalData} weights={userTrainingData.weights} />
           </Route>
           <Route path="/calendar">
             <Calendar userTrainingData={userTrainingData.TrainingData} />
