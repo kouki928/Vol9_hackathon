@@ -1,0 +1,812 @@
+/* 友人FB
+・ボタンの角を丸める　⇒　四角よりは丸の方が良い。
+・色味赤より　⇒　脂肪を燃やすのイメージ
+・「トレーニングを始めよう」を目立たせる　⇒　下文章の改行 or 強調 or 文字数削減
+・選択画面の左右の余白を小さく、上下の余白を大きく　⇒　空間に余白を持たせる。
+*/
+
+:root {
+  padding: 0;
+  margin: 0;
+  --color0: #ff8400;
+  --color1: #ffa048;
+  --color2: #808080;
+  --button: #808080;
+}
+
+* {
+  font-family: "UD デジタル 教科書体 N-B", "UD Digi Kyokasho N-B";
+  /* font-family: "Noto Sans CJK JP";
+  font-weight: 1000; */
+  font-size: 16.54px;
+}
+
+/* 色を指定するプロパティに var(--color0)のように入力 */
+
+#loading {
+  width: 100vw;
+  height: 100vh;
+  transition: all 1s;
+  background-color: var(--color1);
+  /* background-color: #f2711c; */
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 100px;
+  height: 100px;
+  margin: 200px auto;
+  background-color: #fff;
+  border-radius: 100%;
+  animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+
+/* Loading Animation */
+@keyframes sk-scaleout {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+/* Hide Loading Block */
+.loaded {
+  opacity: 0;
+  visibility: hidden;
+}
+
+
+
+
+.header {
+  display: none;
+  padding: 10px;
+  background-color: var(--color0);
+  color: white;
+  width: 100%;
+  top: 0;
+  position: fixed;
+}
+
+/* .header {
+  display: flex;
+  padding: 10px;
+  background-color: var(--color0);
+  color: white;
+  width: auto;
+  position: fixed;
+  top: 0;
+} */
+
+.footer {
+  display: none;
+}
+
+.App {
+  text-align: center;
+  width: 100%;
+  height: 100vh -52px;
+  display: flex;
+  /* flex-direction: column; */
+  padding-top: 50px;
+  /* justify-content: center; */
+  /* align-items: center; */
+}
+
+.Main {
+  flex: auto;
+  padding-left: 250px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.Sidebar {
+  height: 100vh;
+  width: 250px;
+  background-color: var(--color0);
+  position: fixed;
+}
+
+.SidebarList {
+  height: auto;
+  padding: 0;
+  width: 100%;
+}
+
+.SidebarList #active {
+  background-color: var(--color1);
+}
+
+.SidebarList .row {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  color: white;
+  align-items: center;
+  justify-content: center;
+}
+
+.SidebarList .row:hover {
+  cursor: pointer;
+  background-color: var(--color1);
+}
+
+.row #icon {
+  flex: 30%;
+  display: grid;
+  place-items: center;
+}
+
+.row #title {
+  flex: 70%;
+  text-align: start;
+  margin-left: 20px;
+}
+
+.SidebarIcon {
+  padding-top: 20px;
+  padding-bottom: 15px;
+  text-align: center;
+}
+
+.SidebarIcon .Icon {
+  width: 100%;
+}
+
+.SidebarIcon p {
+  font-weight: 600;
+  font-size: 13px;
+  color: white;
+}
+
+.nav-toggle {
+  width: 100%;
+  height: 100%;
+  position: inherit;
+  z-index: 400;
+}
+
+.nav-toggle span {
+  width: 32px;
+  height: 2px;
+  /* margin: 8px 0; */
+  left: 10px;
+  display: inline-block;
+  position: absolute;
+  z-index: 300;
+  background: white;
+  -webkit-transition: .35s ease-in-out;
+  -moz-transition: .35s ease-in-out;
+  transition: .35s ease-in-out;
+}
+
+.nav-toggle span:nth-of-type(1) {
+  top: 14px;
+}
+
+.nav-toggle span:nth-of-type(2) {
+  top: 23px;
+}
+
+.nav-toggle span:nth-of-type(3) {
+  top: 32px;
+}
+
+.nav-toggle#active span:nth-of-type(1) {
+  top: 14px;
+  left: 10px;
+  transform: translateY(8px) rotate(-45deg);
+  width: 33px;
+}
+
+.nav-toggle#active span:nth-of-type(2) {
+  opacity: 0;
+  /*真ん中の線は透過*/
+}
+
+.nav-toggle#active span:nth-of-type(3) {
+  top: 30px;
+  left: 10px;
+  transform: translateY(-8px) rotate(45deg);
+  width: 33px;
+}
+
+.Subbar {
+  display: none;
+}
+
+
+.Form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color0);
+  color: white;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 100vh;
+  /* position: fixed; */
+  z-index: -10;
+}
+
+.wrap {
+  padding: 1.25rem;
+  margin: 1.5rem;
+  display: block;
+  width: 300px;
+  background-color: var(--color0);
+  border-radius: 6px;
+}
+
+.wrap h2 {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+}
+
+.InputLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+input {
+  max-width: 100%;
+  width: 100%;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  padding-bottom: calc(0.5em - 1px);
+  padding-left: calc(0.75em - 1px);
+  padding-right: calc(0.75em - 1px);
+  padding-top: calc(0.5em - 1px);
+  position: relative;
+  vertical-align: top;
+  color: black;
+}
+
+select {
+  color: black;
+  font-size: 1rem;
+  ;
+  margin-bottom: 1rem;
+  height: 40px;
+  width: 100%;
+}
+
+option {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.SignIn {
+  display: none;
+}
+
+.SignIn#active {
+  margin-top: 10px;
+  display: block;
+}
+
+.GuideButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.LoginButton {
+  /* margin-left: 1rem; */
+  padding: 10px 15px;
+  border-radius: 6px;
+  background-color: var(--color0);
+}
+
+.LRToggle {
+  font-size: small;
+}
+
+
+/* ホーム ----------------------------------------------------------------------------- */
+
+.StartTraining {
+  display: block;
+  text-align: center;
+  padding: 24px;
+}
+
+.StartTraining img {
+  margin: 30px auto 0 auto;
+  width: 100px;
+  height: 100px;
+}
+
+.StartTraining h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.discription {
+  margin: 16px 0;
+}
+
+.StartButton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color0);
+  color: white;
+  width: 300px;
+  border-radius: 6px;
+  margin: auto;
+  padding: 12px 15px
+}
+
+.StartButtonIcon {
+  margin-left: 10px;
+}
+
+.StartButtonTitle {
+  margin: auto;
+}
+
+.StartButtonAllow {
+  margin-right: 5px;
+}
+
+.TrainingMenu {
+  display: block;
+  padding: 14px;
+  margin: auto;
+  width: 320px;
+  background-color: rgb(227, 227, 227);
+  border-radius: 6px;
+}
+
+.TrainingMenu p {
+  text-align: center;
+  font-weight: 600;
+  padding-bottom: 12px;
+}
+
+.TrainingText {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color0);
+  color: white;
+  width: 270px;
+  border-radius: 5px;
+  margin: 15px auto;
+  padding: 10px;
+}
+
+.TrainingText:hover {
+  background-color: var(--color1);
+}
+
+.TrainingTitle {
+  margin-right: auto;
+  margin-left: 10px;
+}
+
+.TrainingCount {
+  margin-right: 10px;
+}
+
+.TrainingCount p {
+  font-size: large;
+}
+
+.CameraWrapper {
+  width: 100%;
+
+}
+
+.canvas {
+  padding: 0;
+  margin: auto;
+  /* width: 100%;
+  height: 100%; */
+}
+
+video {
+  visibility: hidden;
+  display: none;
+}
+
+.TrainingCounter {
+  display: block;
+  width: 640px;
+  margin: auto;
+}
+
+.CounterHeader,
+.CounterBox {
+  display: flex;
+}
+
+
+.CounterHeader h2,
+.CounterBox h2 {
+  flex: 1;
+  text-align: center;
+  border: var(--color0) solid 1px;
+
+  font-size: 30px;
+}
+
+.TrainingButton {
+  width: 200px;
+  font-size: 30px;
+  padding: 12px;
+  margin: 30px auto;
+  border-radius: 5px;
+  color: white;
+  background-color: var(--color0);
+}
+
+
+/* カレンダー ---------------------------------------------------------------- */
+
+
+.CalendarArea {
+  height: 90vh;
+  margin: auto;
+  padding: 0 25px;
+}
+
+.CalendarModalForm {
+  width: 300px;
+}
+
+.CalendarModalButton {
+  background-color: var(--color0);
+}
+
+.CalendarDays {
+  display: flex;
+  justify-content: space-around;
+  font-weight: 500;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.ModalTitle {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+#DifferentMonth {
+  color: #c3c3c3;
+  font-weight: 500;
+}
+
+#DifferentMonth p.NoticeCircle {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background: #c3c3c3;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.NoticeCircle {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background: var(--color0);
+  margin: auto;
+  margin-top: 20px;
+}
+
+.GraphContents {
+  margin: auto;
+}
+
+.GraphContent {
+  margin-top: 25px;
+}
+
+.GraphContent {
+  width: 500px;
+  margin: 30px auto;
+}
+
+
+.CircleGood,
+.CircleNice,
+.CircleBad,
+.Traiangle {
+  width: 15px;
+  height: 15px;
+  margin: auto;
+  margin-top: 15px;
+  border-radius: 50%;
+}
+
+.CircleGood {
+  background-color: green;
+}
+
+.CircleNice {
+  background-color: greenyellow;
+}
+
+.Traiangle {
+  background-color: yellow;
+}
+
+.CircleBad {
+  background-color: red;
+}
+
+.gohi {
+  margin: auto;
+  margin-top: 20px;
+}
+
+.CalendarTrainingText {
+  background-color: var(--color0);
+  color: white;
+  margin: 10px;
+  border-radius: 5px;
+}
+
+.ModalListWrapper {
+  display: flex;
+  padding: 4px 4px;
+  align-items: center;
+}
+
+progress {
+  color: white;
+}
+
+
+
+/* canvas {
+  position: fixed;
+  width: 100%;
+} */
+
+
+/* 特典 ------------------------------------------------------------------------------ */
+.PointBox {
+  width: 650px;
+  /* border: #2d445d solid 3px; */
+  background-color: var(--color0);
+  color: white;
+  border-radius: 8px;
+  margin: 20px auto;
+  padding: 15px;
+}
+
+.PointBoxWrapper {
+  display: flex;
+  justify-content: left;
+}
+
+.UserId {
+  margin: 0 30px;
+}
+
+.Pointdiscription {
+  margin: 0 30px;
+  text-align: left;
+}
+
+.CouponBoxWrapper {
+  display: flex;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.CouponBox {
+  width: calc(100% / 2 - 10%);
+  padding: 12px;
+  margin: 12px auto;
+  border: var(--color0) solid 0.5px;
+  border-radius: 6px;
+}
+
+.title {
+  font-size: large;
+  font-weight: 600;
+  text-align: center;
+  margin: 10px;
+}
+
+
+
+
+@media screen and (max-width: 900px) {
+  .App {
+    margin-bottom: 50px;
+  }
+
+  .Main {
+    padding-left: 0;
+  }
+
+  .GraphContent {
+    margin: auto;
+  }
+
+  .header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .header .HamburgerMenu {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header .headerTitle {
+    margin-left: 10px;
+  }
+
+  .header .headerIcon {
+    margin-left: 20px;
+  }
+
+  .nav-toggle {
+    z-index: 400;
+  }
+
+  .Sidebar {
+    display: none;
+  }
+
+  .Subbar {
+    display: none;
+  }
+
+  .Subbar#active {
+    display: block;
+  }
+
+  .Subbar#active .overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+  }
+
+  .Subbar#active .Sidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    background-color: var(--color0);
+    z-index: 200;
+  }
+
+  .CalendarArea {
+    padding: 10px;
+    height: 80vh;
+  }
+
+  .CalendarDayBox {
+    border-width: 0px;
+    border-top: 1.5px solid var(--color0);
+    margin-bottom: 10px;
+  }
+
+  p.NoticeCircle {
+    width: 8px;
+    height: 8px;
+    margin-top: 10px;
+  }
+
+  .gohi {
+    margin: auto;
+    margin-top: 2px;
+  }
+
+  #DifferentMonth p.NoticeCircle {
+    width: 8px;
+    height: 8px;
+    margin-top: 10px;
+  }
+
+  .footer {
+    display: block;
+    width: 100%;
+    padding: 0 1.5rem;
+    /* background-color: rgb(243, 242, 242); */
+    background-color: var(--color0);
+    color: white;
+    border-top: 1px solid #acacac;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+  }
+
+  .FooterWrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .FooterIcon {
+    display: grid;
+    place-items: center;
+  }
+
+  .FooterTitle {
+    text-align: center;
+    font-size: 10px;
+  }
+
+  .NotCurrentPage {
+    flex: 1;
+  }
+
+  .CurrentPage {
+    flex: 1;
+    background-color: var(--color1);
+    border-radius: 10px;
+  }
+
+  .GraphContent {
+    width: 300px;
+  }
+
+  .CircleGood,
+  .CircleNice,
+  .CircleBad,
+  .Traiangle {
+    width: 10px;
+    height: 10px;
+    margin: auto;
+    margin-top: 8px;
+  }
+
+  .TrainingCounter {
+    width: 300px;
+  }
+
+  .PointBox {
+    width: 300px;
+    /* border: #2d445d solid 3px; */
+    background-color: var(--color0);
+    color: white;
+    border-radius: 20px;
+    margin: 15px auto;
+    padding: 15px;
+  }
+
+  .CouponBox {
+    width: calc(100% - 30px);
+  }
+
+  .UserId {
+    margin-right: 10px;
+  }
+
+}
