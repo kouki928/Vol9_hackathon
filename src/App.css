@@ -330,7 +330,7 @@ option {
   display: block;
   text-align: center;
   padding: 24px;
-  margin-top: 52px;
+  margin-top: 20px;
 }
 
 .StartTraining img {
@@ -402,6 +402,14 @@ option {
 
 .TrainingText:hover {
   background-color: var(--color1);
+}
+
+.getWeight {
+  margin: 20px 0;
+  background-color: #ff8400;
+  color: white;
+  border-radius: 15%;
+  padding: 12px 20px;
 }
 
 .TrainingTitle {

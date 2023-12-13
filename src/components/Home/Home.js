@@ -6,6 +6,7 @@ import { db } from '../..';
 import dayjs from "dayjs";
 import { goalToNum, goal, gender, frequency } from '../utility/utilitys';
 import { Today } from '@mui/icons-material';
+import Swal from 'sweetalert2';
 
 function Home(props) {
 
@@ -142,25 +143,55 @@ function Home(props) {
   }
 
   const getWeight = async () => {
-    const ip = "192.168.132.11"
-    const url = `http://${ip}:8000/`
 
-    fetch(url, {
-        method : "GET",
-        credentials: 'include',
-    }).then(response => response.json()).then(response => {
-        const weight = response.weight;
-        personalData.weight = weight;
-        weights[Today] = weight
+    Swal.fire({
+      title: "計測しますか?",
+      text: "乗り終えたら「開始」を押してください。",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText : "戻る",
+      confirmButtonText: "開始"
+    }).then((result) => {
+      if (result.isConfirmed) {
 
-        updateDoc(doc(collection(db, "TrainingData"), userId), {
-          personalData : personalData,
-          weights : weights
+        const ip = "192.168.132.11"
+        const url = `http://${ip}:8000/`
+
+        fetch(url, {
+            method : "GET",
+            credentials: 'include',
+        }).then(response => response.json()).then(response => {
+
+          console.log(weights)
+
+          const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
+          const weight = response.weight;
+          personalData.weight = weight;
+          weights[Today] = weight
+
+          console.log(weights)
+
+          updateDoc(doc(collection(db, "TrainingData"), userId), {
+            personalData : personalData,
+            weights : weights
+          })
+
+          Swal.fire({
+            title: "計測完了！",
+            text: `${weight} g でした。`,
+            icon: "success"
+          });
+
+        }).catch(e => {
+            console.log(e)
         })
+        
+      }
+    });
 
-    }).catch(e => {
-        console.log(e)
-    })
+    
   }
 
   console.log("OK?")
@@ -217,7 +248,7 @@ function Home(props) {
         </p>
       
       <TrainingMenu userTrainingData={userTrainingData}/>
-      <button onClick={getWeight} className='LoginButton'>体重測定</button>
+      <button onClick={getWeight} className='getWeight'>体重測定</button>
 
     
     </div>}
