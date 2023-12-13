@@ -2,10 +2,11 @@ import React from 'react';
 import { SidebarData } from './SidebarData';
 import SidebarIcon from './SidebarIcon';
 
-function Sidebar() {
+function Sidebar(props) {
+  const {userId} = props
   return (
     <div className='Sidebar'>
-        <SidebarIcon />
+        <SidebarIcon userId={userId} />
       <ul className='SidebarList'>
         {SidebarData.map((value, key) => {
             return (

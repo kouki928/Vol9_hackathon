@@ -33,7 +33,7 @@ ChartJS.register(
 
 function Graph(props) {
 
-    const { userTrainingData, personalData } = props;
+    const { userTrainingData, personalData, weights } = props;
 
     const weight = personalData.weight;
 

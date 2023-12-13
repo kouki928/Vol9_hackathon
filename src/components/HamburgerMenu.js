@@ -5,8 +5,8 @@ import Sidebar from './Sidebar';
 import { auth } from "../index";
 import { signOut } from 'firebase/auth';
 
-function HamburgerMenu() {
-
+function HamburgerMenu(props) {
+    const {userId} = props
     const PageData = HamburgerMenuData[window.location.pathname];
     const [active, setActive] = useState(false);
 
@@ -43,7 +43,7 @@ function HamburgerMenu() {
     </div>
     <div className='Subbar' id={active ? "active" : ""}>
         <div className='overlay' onClick={classToggle}>
-            <Sidebar />
+            <Sidebar userId={userId}/>
         </div>
     </div>
     </>

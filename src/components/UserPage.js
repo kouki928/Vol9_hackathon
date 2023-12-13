@@ -3,12 +3,13 @@ import { db } from '..';
 import { updateDoc, collection, doc } from 'firebase/firestore';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import dayjs from 'dayjs';
 
 const MySwal = withReactContent(Swal);
 
 
 function UserPage(props) {
-    const {personalData, userId} = props;
+    const {personalData, userId, weights} = props;
 
     const [height, setHeight] = useState(personalData.height);
     const [weight, setWeight] = useState(personalData.weight);
@@ -30,8 +31,13 @@ function UserPage(props) {
         }
         // console.log(data)
 
+        let weight_list = weights;
+
+        weight_list[dayjs().format("YYYY/MM/DD")] = weight
+
         updateDoc(doc(collection(db,"TrainingData"), userId), {
             personalData : data,
+            weights : weight_list,
         }).then(() => {
             MySwal.fire("変更完了","","success")
         })

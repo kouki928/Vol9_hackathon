@@ -1,15 +1,16 @@
 import React from 'react'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-function SidebarIcon() {
-  const UserId = localStorage.getItem("UserId")
+function SidebarIcon(props) {
+  const {userId} = props
+  console.log(userId)
   return (
     <div className='SidebarIcon'>
       {/* <img src={AccountCircleIcon}></img> */}
       <div className='Icon'>
         < AccountCircleIcon />
       </div>
-      <p>yourId : {UserId}</p>
+      <p>yourId : <br></br> {userId}</p>
     </div>
   )
 }

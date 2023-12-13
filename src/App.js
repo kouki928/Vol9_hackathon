@@ -101,11 +101,14 @@ function App() {
         }
     
         result.TrainingData[Today] = data;
+        result.weights[Today] = result.weights[dayjs().add(-1, "day").format("YYYY/MM/DD")] === undefined ?
+        result.personalData.weight : result.weights[dayjs().add(-1, "day").format("YYYY/MM/DD")]
         setUserTrainingData(result)
         console.log(result)
         setDoc(doc(collection(db,"TrainingData"), userId), {
           TrainingData : result.TrainingData,
-          personalData : result.personalData
+          personalData : result.personalData,
+          weights      : result.weights,
         }).catch(error => {
           console.log(error)
         })
@@ -248,9 +251,9 @@ function App() {
     return (
     <>
     <BrowserRouter>
-      {parentStyle ? <></> : <HamburgerMenu /> }
+      {parentStyle ? <></> : <HamburgerMenu userId={userId} /> }
       <div className='App'>
-        <Sidebar />
+        <Sidebar userId={userId}/>
         <Switch>
           <Route exact path="/">
             <Home userTrainingData={userTrainingData.TrainingData} firstFlag={firstFlag} userId={userId} />
@@ -260,15 +263,16 @@ function App() {
           </Route>
           
           <Route path='/graph'>
-            <Graph userTrainingData={userTrainingData.TrainingData} personalData={userTrainingData.personalData}/>
+            <Graph userTrainingData={userTrainingData.TrainingData} personalData={userTrainingData.personalData}
+            weights={userTrainingData.weights}/>
           </Route>
           
           <Route path="/setting">
-            <Setting />
+            <Setting userId={userId} userTrainingData={userTrainingData.TrainingData} />
           </Route>
           
           <Route path="/user">
-            <UserPage personalData={userTrainingData.personalData} userId={userId}/>
+            <UserPage personalData={userTrainingData.personalData} userId={userId} weights={userTrainingData.weights}/>
           </Route>
 
           <Route path='/training'>

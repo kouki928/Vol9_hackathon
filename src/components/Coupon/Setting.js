@@ -6,10 +6,9 @@ import withReactContent from 'sweetalert2-react-content'
 
 const MySwal = withReactContent(Swal)
 
-function Setting() {
+function Setting(props) {
 
-  const UserId = localStorage.getItem("UserId")
-  const userTrainingData = JSON.parse(localStorage.getItem("userTrainingData"));
+  const {userId, userTrainingData} = props;
   let keyDays = Object.keys(userTrainingData).reverse().reverse()
   let point = 0;
 
@@ -26,7 +25,7 @@ function Setting() {
 
       <div className='PointBox'>
         <div className='PointBoxWrapper'>
-          <div className='InputLabel UserId'>{"　<ID>　"}{UserId}</div>
+          <div className='InputLabel UserId'>{"　<ID>　"}{userId}</div>
           <div className='InputLabel'>{"　<保有ポイント>　"}{point} pt </div>
         </div>
 
