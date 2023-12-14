@@ -68,6 +68,9 @@ function Home(props) {
           [Today] : data
         },
         personalData : personalData,
+        weights : {
+          [Today] : weightRef.current.value
+        }
       })
 
       trainingData = { [Today] : data }

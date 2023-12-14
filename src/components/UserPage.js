@@ -27,7 +27,7 @@ function UserPage(props) {
             age : age,
             gender : genderRef.current.value,
             frequency : trainingRef.current.value,
-            target : targetRef.current.value
+            goal : targetRef.current.value
         }
         // console.log(data)
 

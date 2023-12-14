@@ -69,6 +69,7 @@ function App() {
 
     const parsonSelection = async (data, result) => {
       // 目標BMIに基づく理想体重の算出
+      console.log(data, "!!Error!!")
     
       const url = "https://vol9-hackathon-predictionapi.onrender.com/target/"
       fetch(url, {
@@ -122,7 +123,7 @@ function App() {
     
     }
 
-    const createMenu = async (result, userId) => {
+    const createMenu = async (result) => {
       const personalData = result.personalData;
       const trainingData = result.TrainingData;
       var i = 0;
@@ -207,11 +208,7 @@ function App() {
         else if (result.TrainingData[Today] === undefined) {
           // result.TrainingData[Today] = createTrainingMenu(result.TrainingData);
           createMenu(result)
-          // setUserTrainingData(result)
-          // setDoc(doc(collection(db,"TrainingData"), userId), {
-          //   TrainingData : result.TrainingData,
-          //   personalData : result.personalData
-          // })
+
         }else{
           // createMenu(result)
           setUserTrainingData(result)
