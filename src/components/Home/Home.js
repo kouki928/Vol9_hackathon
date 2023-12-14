@@ -161,7 +161,8 @@ function Home(props) {
       if (result.isConfirmed) {
 
         const ip = "192.168.0.9"
-        const url = `http://${ip}:8000/`
+        // const url = `http://${ip}:8000/`
+        const url = "https://ff92-180-145-216-160.ngrok-free.app/"
 
         fetch(url, {
             method : "GET",

@@ -9,17 +9,16 @@ import dayjs from 'dayjs';
 import { collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../index';
 
-
-// 追加 ----------------------------------------------------------------------------------
 import Up from "../../images/Up.png";
 import Down from "../../images/Down.png";
+import CREAR from "../../images/CREAR.png";
 import macho from "../../images/macho.png";
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 import { Camera } from "@mediapipe/camera_utils";
 import { drawConnectors, drawLandmarks, clamp } from "@mediapipe/drawing_utils";
 import { Pose, POSE_CONNECTIONS, POSE_LANDMARKS_LEFT, POSE_LANDMARKS_NEUTRAL, POSE_LANDMARKS_RIGHT } from "@mediapipe/pose/pose";
+import { transform } from 'typescript';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 /** PoseDetection ----------------------------------------------------------
 * Componentクラスを継承したクラス。クラスである意味は特になく、検索結果の産物
@@ -51,13 +50,21 @@ class PoseDetection extends Component {
       count: props.userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType],
       buttonText: "中断する",
       totalTime: props.userTrainingData[dayjs().format("YYYY/MM/DD")]["totalTime"][this.trainingType],
-      orientation : window.screen.orientation,
+      orientation: window.screen.orientation,
+      flag : false,
+      clear : false
     }
     this.frameCount = 0;
     this.angleList = [];
-    this.flag = false;
+    // this.state.flag = false;
+    this.prevFlag = false;
     this.angle = 0;
     this.stopTimeCount = 0;
+    this.beforCount = null;
+
+    this.config = { position: [0, 0], size: [0, 0] };
+    this.upConfig = { position: [0, 0], size: [0, 0] };
+    this.downConfig = { position: [0, 0], size: [0, 0] };
   }
 
   /** conmonentDidMount --------------------------------------------------------------------------
@@ -75,6 +82,7 @@ class PoseDetection extends Component {
     // testCTX.scale(-1,1)
     out5.style.transform = "scaleX(-1)";
     const canvasCtx5 = out5.getContext('2d');
+    const canvasCtx5RestCount = out5.getContext('2d');
     // canvasCtx5.rotate((90 * Math.PI) / 180)
     const userTrainingData = this.props.userTrainingData
     const Today = dayjs().format("YYYY/MM/DD") // 今日の日付
@@ -82,27 +90,28 @@ class PoseDetection extends Component {
 
     this.props.onChangeStyle(true);
 
-
-
-
-    // この辺の宣言 -----------------------------------------------------------------------------------------
-
-
-    let back_image = false;
-
     // 画像を宣言
-    
     const udImage = new Image();
-    udImage.className = "udImage"
-
-
-
+    udImage.className = "udImage";
+    const CImage = new Image();
+    CImage.className = "CImage";
     udImage.onload = () => {
-      canvasCtx5.scale(-1,1)
-      canvasCtx5.drawImage(udImage, 0,0 , 70, 70)
-      canvasCtx5.scale(-1,1)
-
-    }
+      canvasCtx5.scale(-1, 1);
+      canvasCtx5.drawImage(udImage, ...this.config.position, ...this.config.size);
+      canvasCtx5.scale(-1, 1);
+    };
+    // CREARの詳細設定
+    // let CConfig;
+    // if (this.trainingType === "LegTraining") {
+    //   CConfig = { position: [-360, 250], size: [350, 150] };
+    // } else {
+    //   CConfig = { position: [-500, 120], size: [350, 150] };
+    // }
+    // CImage.onload = () => {
+    //   canvasCtx5.scale(-1, 1);
+    //   canvasCtx5.drawImage(CImage, ...CConfig.position, ...CConfig.size);
+    //   canvasCtx5.scale(-1, 1);
+    // };
 
 
     /** 画角メモ
@@ -116,7 +125,7 @@ class PoseDetection extends Component {
      * カメラから 縦2, 横1 の画面を切り取る。3/2 = 1.5 - 0.5 = 1  1+1で2なので、 1 ~ 2の横と 縦 2を撮る。
      * これを canvas のサイズに拡大して張り付けて終了
      */
-    
+
 
 
     // 描写のためのカメラ調整パラメータ
@@ -124,32 +133,16 @@ class PoseDetection extends Component {
     const cx = window.innerWidth;
     const cy = window.innerHeight;
     const rate = this.trainingType === "LegTraining" ? video5.height / cy : video5.width / cx // カメラとcanvasの比率
-    const gap = this.trainingType  === "LegTraining" ? rate * cx : rate * cy// 最大を取らない方の幅
-    const sx = this.trainingType   === "LegTraining" ? video5.width / 2 - gap / 2 : 0;
-    const sy = this.trainingType   === "LegTraining" ? 0 : video5.height / 2 - gap / 2;
-    const sWidth = this.trainingType  === "LegTraining" ? gap : video5.width;
+    const gap = this.trainingType === "LegTraining" ? rate * cx : rate * cy// 最大を取らない方の幅
+    const sx = this.trainingType === "LegTraining" ? video5.width / 2 - gap / 2 : 0;
+    const sy = this.trainingType === "LegTraining" ? 0 : video5.height / 2 - gap / 2;
+    const sWidth = this.trainingType === "LegTraining" ? gap : video5.width;
     const sHeight = this.trainingType === "LegTraining" ? video5.height : gap
     const dx = this.trainingType === "LegTraining" ? 0 : 0
     const dy = this.trainingType === "LegTraining" ? 0 : 0
-    const dWidth = this.trainingType  === "LegTraining" ? cx : cx
+    const dWidth = this.trainingType === "LegTraining" ? cx : cx
     const dHeight = this.trainingType === "LegTraining" ? cy : cy;
 
-    console.log({
-      videoW : video5.width,
-      videoH : video5.height,
-      cx : cx,
-      cy : cy,
-      rate : rate,
-      gap : gap,
-      sx : sx,
-      sy : sy,
-      sWidth : sWidth,
-      sHeight : sHeight,
-      dx : dx,
-      dy : dy,
-      dWidth : dWidth,
-      dHeight : dHeight
-    })
     /**calculateAngleWithin180 --------------------------------------------------------------------------
    * webカメラから得た座標情報を基に角度を計算する関数。
    --------------------------------------------------------------------------------------------------*/
@@ -164,6 +157,53 @@ class PoseDetection extends Component {
       return Math.round(theta);
     }
 
+    // 残り回数描画関数（フェードアウト実装）
+    const fadeOutText = (startTime) => {
+      let animationId;
+      const currentTime = Date.now();
+      const elapsed = currentTime - startTime;
+      const duration = 1000; // 1秒間のアニメーション
+      const opacity = Math.min(1, elapsed / duration);
+      canvasCtx5RestCount.globalAlpha = 1 - opacity;
+      // テキストの描画
+      canvasCtx5RestCount.scale(-1, 1);
+      canvasCtx5RestCount.fillStyle = "#ff4000";
+      canvasCtx5RestCount.font = "350px Arial";
+      let restCount = userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count;
+      if (this.trainingType === "LegTraining") {    // 縦画面対応
+        if (restCount / 10 < 10) {
+          canvasCtx5RestCount.fillText(`${restCount}`, -285, 450);
+        } else {
+          canvasCtx5RestCount.fillText(`${restCount}`, -380, 450);
+        }
+      } else {                                      // 横画面対応
+        if (restCount / 10 < 10) {
+          canvasCtx5RestCount.fillText(`${restCount}`, -400, 315);
+        } else {
+          canvasCtx5RestCount.fillText(`${restCount}`, -540, 315);
+        }
+      }
+      if (elapsed < duration) {
+        animationId = requestAnimationFrame(() => fadeOutText(startTime));
+      } else {
+        canvasCtx5RestCount.globalAlpha = 1.0; // 透過度を初期化
+      }
+      canvasCtx5RestCount.scale(-1, 1);
+    }
+
+    // const drawCount = (count) => {
+    //   canvasCtx5.scale(-1, 1);
+    //   canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
+    //   canvasCtx5.font = "100px Arial"; // フォントサイズと種類
+    //   canvasCtx5.fillText(`${count}`, -480, 220); // 現在の回数を描画
+    //   canvasCtx5.scale(-1, 1);
+
+    //   // 0.5秒後に描画をクリア
+    //   setTimeout(() => {
+    //     canvasCtx5.clearRect(-480, 220 - 100, 300, 150); // 描画をクリアする範囲を調整する可能性があります
+    //   }, 500); // 500ミリ秒（0.5秒）後に実行
+    // };
+
     /**muscle_counter ------------------------------------------------------------------------------------
    * localStorageに保存したカウントを上昇させる。
    * keypointsには各部位の座標データが保存されている。
@@ -176,14 +216,11 @@ class PoseDetection extends Component {
       let average_score = 0;
       let right_average_score = 0
       let left_average_score = 0
-      console.log(this.state.count)
 
       if (this.state.count === goal_count) {
-        canvasCtx5.scale(-1, 1);
-        canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
-        canvasCtx5.font = "100px Arial"; // フォントサイズと種類
-        canvasCtx5.fillText(`CLEAR`, -480, 275); // 指示を描画
-        canvasCtx5.scale(-1, 1);
+        this.setState({
+          clear : true
+        })
         this.setState({
           buttonText: "完了!"
         })
@@ -232,12 +269,21 @@ class PoseDetection extends Component {
           this.angle = sum / this.frameCount;
           this.angle = Math.round(this.angle);
           // 判定
-          if (this.flag === false && this.angle > 120 && average_score > 0.6) {
-            this.flag = true;
+          if (this.state.flag === false && this.angle > 120 && average_score > 0.6) {
+            this.setState({
+              flag : true
+            })
             this.stopTimeCount = 0;
-          } else if (this.flag === true && this.angle < 90 && average_score > 0.6) {
+          } else if (this.state.flag === true && this.angle < 90 && average_score > 0.6) {
+            if (this.beforCount !== this.state.count) {
+              fadeOutText(Date.now());
+              this.beforCount = this.state.count;
+            }
             this.setState({ count: this.state.count + 1 })
-            this.flag = false;
+            // drawCount(this.state.count);
+            this.setState({
+              flag : false
+            })
             this.stopTimeCount = 0;
           }
           // 初期化
@@ -286,12 +332,21 @@ class PoseDetection extends Component {
           this.angle = sum / this.frameCount;
           this.angle = Math.round(this.angle);
           // 判定
-          if (this.flag === false && this.angle > 130 && average_score > 0.6) {
-            this.flag = true;
+          if (this.state.flag === false && this.angle > 130 && average_score > 0.6) {
+            this.setState({
+              flag : true
+            })
             this.stopTimeCount = 0;
-          } else if (this.flag === true && this.angle < 60 && average_score > 0.6) {
+          } else if (this.state.flag === true && this.angle < 60 && average_score > 0.6) {
+            if (this.beforCount !== this.state.count) {
+              fadeOutText(Date.now());
+              this.beforCount = this.state.count;
+            }
             this.setState({ count: this.state.count + 1 })
-            this.flag = false;
+            // drawCount(this.state.count);
+            this.setState({
+              flag : false
+            })
             this.stopTimeCount = 0;
           }
           // 初期化
@@ -340,12 +395,23 @@ class PoseDetection extends Component {
           this.angle = sum / this.frameCount;
           this.angle = Math.round(this.angle);
           // 判定
-          if (this.flag === false && this.angle > 150 && average_score > 0.6) {
-            this.flag = true;
+          if (this.state.flag === false && this.angle > 150 && average_score > 0.6) {
+            // this.state.flag = true;
+            this.setState({
+              flag : true
+            })
             this.stopTimeCount = 0;
-          } else if (this.flag === true && this.angle < 100 && average_score > 0.6) {
+          } else if (this.state.flag === true && this.angle < 100 && average_score > 0.6) {
+            if (this.beforCount !== this.state.count) {
+              fadeOutText(Date.now());
+              this.beforCount = this.state.count;
+            }
             this.setState({ count: this.state.count + 1 })
-            this.flag = false;
+            // drawCount(this.state.count);
+            // this.state.flag = false;
+            this.setState({
+              flag : false
+            })
             this.stopTimeCount = 0;
           }
           // 初期化
@@ -354,68 +420,78 @@ class PoseDetection extends Component {
         }
       }
 
-      // 画像内に描画
+      // 縦画面対応 ------------------------
       canvasCtx5.scale(-1, 1);
-      canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
-      canvasCtx5.font = "60px Arial"; // フォントサイズと種類
-      canvasCtx5.fillText(`Angle: ${this.angle}°`, -630, 50); // 角度を描画
 
-
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      ///
-      /// ここのif文 ----------------------------------------------------------
-      ///
-      ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-      if (this.flag === true) {
-
-        if (back_image !== this.flag){
-          udImage.src = Down
-        }
-        // canvasCtx5.fillStyle = "#0000FF"; // 青色のフォント
-        // canvasCtx5.font = "80px Arial"; // フォントサイズと種類
-        // canvasCtx5.fillText(`⇩`, -200, 50); // 指示を描画
-        // canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
+      // UpとDownの詳細設定
+      if (which === "LegTraining") {
+        this.upConfig = { position: [-160, 510], size: [150, 150] };
+        this.downConfig = { position: [-200, 510], size: [200, 200] };
       } else {
+        this.upConfig = { position: [-180, 230], size: [150, 150] };
+        this.downConfig = { position: [-210, 230], size: [200, 200] };
+      }
+      this.config = this.state.flag ? this.downConfig : this.upConfig;
 
-        if (back_image !== this.flag){
-          udImage.src = Up
+      if (this.prevFlag !== this.state.flag){
+        udImage.src = this.state.flag ? Down : Up;
+        this.prevFlag = this.state.flag
+      }
+
+      
+
+      if (which === "LegTraining") {
+        canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
+        canvasCtx5.font = "40px Arial"; // フォントサイズと種類
+        canvasCtx5.fillText("残り", -340, 540);
+        if ((userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count) / 10 <= 10) {
+          canvasCtx5.font = "120px Arial"; // フォントサイズと種類
+          canvasCtx5.fillText(`${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count}`, -335, 645);
+        } else {
+          canvasCtx5.font = "120px Arial"; // フォントサイズと種類
+          canvasCtx5.fillText(`${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count}`, -367, 645);
         }
-        // canvasCtx5.fillStyle = "#FF⇩⇩0000"; // 赤色のフォント
-        // canvasCtx5.font = "80px Arial"; // フォントサイズと種類
-        // canvasCtx5.fillText(`⇧`, -150, 50); // 指示を描画
-        // canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
       }
-      canvasCtx5.font = "70px Arial"; // フォントサイズと種類
-      canvasCtx5.fillText(`残り ${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count} 回`, -630, 470);
+      // 横画面対応 ------------------------
+      else {
+        canvasCtx5.fillStyle = "#FFFFFF"; // 白色のフォント
+        canvasCtx5.font = "40px Arial"; // フォントサイズと種類
+        canvasCtx5.fillText("残り", -605, 270);
+        if ((userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count) / 10 <= 10) {
+          canvasCtx5.font = "120px Arial"; // フォントサイズと種類
+          canvasCtx5.fillText(`${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count}`, -605, 365);
+        } else {
+          canvasCtx5.font = "120px Arial"; // フォントサイズと種類
+          canvasCtx5.fillText(`${userTrainingData[dayjs().format("YYYY/MM/DD")]["target"][this.trainingType] - this.state.count}`, -630, 365);
+        }
+      }
       canvasCtx5.scale(-1, 1);
 
-      // 経過時間を描画
-      canvasCtx5.scale(-1, 1);
-      canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
-      canvasCtx5.font = "90px Arial"; // フォントサイズと種類
-      let timeString = this.state.totalTime.toString();
-      if (timeString.length === 1) {
-        canvasCtx5.fillText(`${this.state.totalTime}`, -120, 470); // 経過時間を描画      
-      } else if (timeString.length === 2) {
-        canvasCtx5.fillText(`${this.state.totalTime}`, -160, 470); // 経過時間を描画
-      } else if (timeString.length === 3) {
-        canvasCtx5.fillText(`${this.state.totalTime}`, -210, 470); // 経過時間を描画
-      } else if (timeString.length === 4) {
-        canvasCtx5.fillText(`${this.state.totalTime}`, -260, 470); // 経過時間を描画
-      }
-      canvasCtx5.fillText(`s`, -50, 470); // 経過時間を描画
-      canvasCtx5.scale(-1, 1);
+      // // 経過時間を描画
+      // canvasCtx5.scale(-1, 1);
+      // canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
+      // canvasCtx5.font = "90px Arial"; // フォントサイズと種類
+      // let timeString = this.state.totalTime.toString();
+      // if (timeString.length === 1) {
+      //   canvasCtx5.fillText(`${this.state.totalTime}`, -120, 470); // 経過時間を描画      
+      // } else if (timeString.length === 2) {
+      //   canvasCtx5.fillText(`${this.state.totalTime}`, -160, 470); // 経過時間を描画
+      // } else if (timeString.length === 3) {
+      //   canvasCtx5.fillText(`${this.state.totalTime}`, -210, 470); // 経過時間を描画
+      // } else if (timeString.length === 4) {
+      //   canvasCtx5.fillText(`${this.state.totalTime}`, -260, 470); // 経過時間を描画
+      // }
+      // canvasCtx5.fillText(`s`, -50, 470); // 経過時間を描画
+      // canvasCtx5.scale(-1, 1);
 
-      // ストップ時間カウント
-      canvasCtx5.scale(-1, 1);
-      // canvasCtx5.rotate(90);
-      canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
-      canvasCtx5.font = "100px Arial"; // フォントサイズと種類
-      canvasCtx5.fillText(`${this.stopTimeCount}`, -480, 275); // 停止時間を描画
-      canvasCtx5.scale(-1, 1);
-      // canvasCtx5.rotate(-90)
+      // // ストップ時間カウント
+      // canvasCtx5.scale(-1, 1);
+      // // canvasCtx5.rotate(90);
+      // canvasCtx5.fillStyle = "#FF0000"; // 赤色のフォント
+      // canvasCtx5.font = "100px Arial"; // フォントサイズと種類
+      // canvasCtx5.fillText(`${this.stopTimeCount}`, -480, 275); // 停止時間を描画
+      // canvasCtx5.scale(-1, 1);
+      // // canvasCtx5.rotate(-90)
     }
 
     /** detectPose --------------------------------------------------------- 
@@ -424,6 +500,7 @@ class PoseDetection extends Component {
     * 姿勢検知した座標の点を canvas に描き、video と重ねる事で表示が実現されている。
     * ----------------------------------------------------------------------- */
     const detectPose = async () => {
+
       let timer;
       // ストップウォッチを開始する関数
       const startStopwatch = () => {
@@ -444,13 +521,16 @@ class PoseDetection extends Component {
         canvasCtx5.save(); // キャンバスの状態を保存
         canvasCtx5.clearRect(0, 0, canvasCtx5.width, canvasCtx5.height); // キャンバスをクリア
 
+        canvasCtx5RestCount.save(); // キャンバスの状態を保存
+        canvasCtx5RestCount.clearRect(0, 0, canvasCtx5.width, canvasCtx5.height); // キャンバスをクリア
+
         // if (trainingType !== "LegTraining") {
         //   // canvasCtx5.rotate(-90)
         // }
 
         // const Image = results.image.getImageData()
 
-        canvasCtx5.drawImage(results.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight, ); // 画像を描画
+        canvasCtx5.drawImage(results.image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight,); // 画像を描画
         // canvasCtx5.drawImage(results.image, 0, 0, out5.width, out5.height, ); // 画像を描画
 
         if (results.poseLandmarks === null || results.poseLandmarks === undefined) {
@@ -502,7 +582,7 @@ class PoseDetection extends Component {
         );
 
 
-        
+
 
         canvasCtx5.restore(); // キャンバスの状態を復元
 
@@ -535,7 +615,7 @@ class PoseDetection extends Component {
     // ここでdetectPoseが実行される。 -------------------------------------------
     detectPose()
 
-    if (this.trainingType !== "LegTraining"){
+    if (this.trainingType !== "LegTraining") {
       this.canvasRef.current.style.transform = "rotate(90)"
     }
 
@@ -551,14 +631,20 @@ class PoseDetection extends Component {
     const userId = this.props.userId
     const cx = window.innerWidth > 900 ? window.innerWidth - 250 : window.innerWidth;
     const cy = window.innerWidth > 900 ? window.innerHeight : window.innerHeight;
-    
+
     const width = window.innerWidth;
     const height = width / 4 * 3
 
-    
+
     return (
       <div className='Main'>
         <div className='CameraWrapper'>
+          <img src={this.state.flag ? Up : Down} className='udImage'></img>
+
+          {this.state.clear ? 
+          <img src={CREAR} className='CImage'></img> : <></> }
+          {/* <img src={Down} className='udImage'></img>
+          <img src={Up} className='udImage'></img> */}
           <div className='batsu' onClick={
             async () => {
               userTrainingData[dayjs().format("YYYY/MM/DD")]["training"][this.trainingType] = this.state.count
