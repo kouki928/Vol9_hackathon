@@ -20,8 +20,6 @@ import macho from "../../images/macho.png";
 import { Camera } from "@mediapipe/camera_utils";
 import { drawConnectors, drawLandmarks, clamp } from "@mediapipe/drawing_utils";
 import { Pose, POSE_CONNECTIONS, POSE_LANDMARKS_LEFT, POSE_LANDMARKS_NEUTRAL, POSE_LANDMARKS_RIGHT } from "@mediapipe/pose/pose";
-import { transform } from 'typescript';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 /** PoseDetection ----------------------------------------------------------
 * Componentクラスを継承したクラス。クラスである意味は特になく、検索結果の産物

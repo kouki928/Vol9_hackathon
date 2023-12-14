@@ -20,7 +20,6 @@ import dayjs from "dayjs";
 import { auth, db } from './index';
 import Loading from './components/Loading';
 import { goal, gender, frequency } from './components/utility/utilitys';
-import * as ort from "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/esm/ort.min.js";
 
 // import { getData } from '../public/model';
 
@@ -102,8 +101,9 @@ function App() {
         }
     
         result.TrainingData[Today] = data;
-        result.weights[Today] = result.weights[dayjs().add(-1, "day").format("YYYY/MM/DD")] === undefined ?
-        result.personalData.weight : result.weights[dayjs().add(-1, "day").format("YYYY/MM/DD")]
+        // result.weights[Today] = result.weights[dayjs().add(-1, "day").format("YYYY/MM/DD")] === undefined ?
+        // result.personalData.weight : result.weights[dayjs().add(-1, "day").format("YYYY/MM/DD")]
+        result.weights[Today] = result.personalData.weight
         setUserTrainingData(result)
         console.log(result)
         setDoc(doc(collection(db,"TrainingData"), userId), {
