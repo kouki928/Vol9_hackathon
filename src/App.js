@@ -99,7 +99,8 @@ function App() {
             PectoralTraining : 0
           }
         }
-    
+        
+        console.log(result)
         result.TrainingData[Today] = data;
         // result.weights[Today] = result.weights[dayjs().add(-1, "day").format("YYYY/MM/DD")] === undefined ?
         // result.personalData.weight : result.weights[dayjs().add(-1, "day").format("YYYY/MM/DD")]

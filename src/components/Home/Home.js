@@ -160,7 +160,7 @@ function Home(props) {
     }).then((result) => {
       if (result.isConfirmed) {
 
-        const ip = "192.168.132.11"
+        const ip = "192.168.0.9"
         const url = `http://${ip}:8000/`
 
         fetch(url, {
