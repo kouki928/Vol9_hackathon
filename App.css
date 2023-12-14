@@ -95,7 +95,7 @@
   height: 100vh -52px;
   display: flex;
   /* flex-direction: column; */
-  padding-top: 50px;
+  /* padding-top: 50px; */
   /* justify-content: center; */
   /* align-items: center; */
 }
@@ -115,6 +115,7 @@
   height: 100vh;
   width: 250px;
   background-color: var(--color0);
+  color: white;
   position: fixed;
 }
 
@@ -245,7 +246,7 @@
   margin: 1.5rem;
   display: block;
   width: 300px;
-  background-color: var(--color1);
+  background-color: var(--color0);
   border-radius: 6px;
 }
 
@@ -314,7 +315,6 @@ option {
 .LoginButton {
   /* margin-left: 1rem; */
   padding: 10px 15px;
-  margin: 15px;
   border-radius: 6px;
   background-color: var(--color0);
 }
@@ -330,6 +330,7 @@ option {
   display: block;
   text-align: center;
   padding: 24px;
+  margin-top: 20px;
 }
 
 .StartTraining img {
@@ -403,6 +404,14 @@ option {
   background-color: var(--color1);
 }
 
+.getWeight {
+  margin: 20px 0;
+  background-color: #ff8400;
+  color: white;
+  border-radius: 15%;
+  padding: 12px 20px;
+}
+
 .TrainingTitle {
   margin-right: auto;
   margin-left: 10px;
@@ -423,7 +432,7 @@ option {
 
 .canvas {
   padding: 0;
-  margin: auto;
+  /* margin: auto; */
   /* width: 100%;
   height: 100%; */
 }
@@ -462,6 +471,24 @@ video {
   border-radius: 5px;
   color: white;
   background-color: var(--color0);
+}
+
+.udImage {
+  position: absolute;
+  top: 140px;
+  right: 40px;
+  z-index: 1000;
+  width: 120px;
+  height: 120px;
+}
+
+.CImage {
+  position: absolute;
+  top: 140px;
+  right: 40px;
+  z-index: 1000;
+  width: 120px;
+  height: 120px;
 }
 
 
@@ -597,23 +624,22 @@ progress {
   color: white;
   border-radius: 8px;
   margin: 20px auto;
+  margin-top: 52px;
   padding: 15px;
 }
 
-.PointBoxWrapper {
-  display: flex;
-  justify-content: left;
-}
+/* .PointBoxWrapper { */
+/* display: flex; */
+/* justify-content: left; */
+/* } */
 
 .UserId {
   margin: 0 30px;
-  font-family: "Noto Sans CJK JP";
-  font-size: 16.54px;
 }
 
 .Pointdiscription {
-  margin-bottom: 10px;
-  text-align: center;
+  margin: 0 30px;
+  text-align: left;
 }
 
 .CouponBoxWrapper {
@@ -626,7 +652,7 @@ progress {
   width: calc(100% / 2 - 10%);
   padding: 12px;
   margin: 12px auto;
-  border: var(--color0) solid 1.5px;
+  border: var(--color0) solid 0.5px;
   border-radius: 6px;
 }
 
@@ -641,9 +667,9 @@ progress {
 
 
 @media screen and (max-width: 900px) {
-  .App {
+  /* .App {
     margin-bottom: 50px;
-  }
+  } */
 
   .Main {
     padding-left: 0;
@@ -666,6 +692,10 @@ progress {
 
   .header .headerTitle {
     margin-left: 10px;
+  }
+
+  .headerTitle {
+    padding-top: 7px;
   }
 
   .header .headerIcon {
@@ -712,6 +742,7 @@ progress {
 
   .CalendarArea {
     padding: 10px;
+    margin-top: 52px;
     height: 80vh;
   }
 
@@ -745,6 +776,7 @@ progress {
     /* background-color: rgb(243, 242, 242); */
     background-color: var(--color0);
     color: white;
+    border-top: 1px solid #acacac;
     position: fixed;
     left: 0;
     bottom: 0;
@@ -776,6 +808,7 @@ progress {
   }
 
   .GraphContent {
+    margin-top: 52px;
     width: 300px;
   }
 
@@ -800,6 +833,7 @@ progress {
     color: white;
     border-radius: 20px;
     margin: 15px auto;
+    margin-top: 72px;
     padding: 15px;
   }
 
@@ -809,6 +843,45 @@ progress {
 
   .UserId {
     margin-right: 10px;
+  }
+
+  .canvas {
+    top: 0;
+  }
+
+  .formWrapper {
+    margin-top: 62px;
+  }
+
+  .batsu {
+    font-size: 30px;
+    /*ボタンの大きさ*/
+
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+
+    border-radius: 100%;
+    width: 60px;
+    line-height: 60px;
+    cursor: pointer;
+    transition: .2s;
+    background: var(--color0);
+    border-color: white;
+    color: #FFF;
+  }
+
+  .batsu:hover {
+    font-weight: bold;
+    border: 2px solid var(--color0);
+    color: var(--color0);
+    background-color: white;
+    font-weight: 900;
   }
 
 }
