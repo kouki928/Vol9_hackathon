@@ -19,7 +19,7 @@ function TrainingMenu(props) {
 
   const Today = dayjs().format("YYYY/MM/DD");
 
-  // console.log(userTrainingData)
+  console.log(userTrainingData)
 
   const todayData = userTrainingData[Today]
   const Menu = [

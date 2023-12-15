@@ -240,8 +240,6 @@ function App() {
   /* ローディング後かつログインしている時 ---------------------------------------------------- */
   else{
 
-    console.log(firstFlag)
-
     if (isEmpty(userTrainingData) && !firstFlag){
       return (<Loading></Loading>)
     }

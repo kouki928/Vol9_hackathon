@@ -8,19 +8,17 @@ import SignUpWithGoogle from "../images/SignUpWithGoogle.png";
 
 function Login() {
 
-    // const userList = 
     const [active, setActive] = useState(false);
-    // const [UserId, setUserId] = useState("");
     const [password, setPassword] = useState("");
     const [SecondPassword, setSecondPassword] = useState("");
     const [Title, setTitle] = useState("ログイン");
     const [Email, setEmail] = useState("");
-    // const [AuthPassword, setAuthPassword] = useState("");
 
-    
-    // const EmailRef = useRef(null);
-    
 
+    // ユーザ登録とログインを切り替える。 --------------------------------------------------
+    // useState で値が変わるたびに html の class が変更される
+    // これによって画面切り替えを行っている 
+    // -----------------------------------------------------------------------------------//
     const classToggle = () => {
         setActive(!active);
         if (Title === "ログイン"){
@@ -88,33 +86,9 @@ function Login() {
     }
 
     const googleSignIn = async () => {
-
         signInWithRedirect(auth, provider)
-        
-        // signInWithPopup(auth, provider)
-        // .then((result) => {
-        //     // This gives you a Google Access Token. You can use it to access the Google API.
-        //     const credential = GoogleAuthProvider.credentialFromResult(result);
-        //     const token = credential.accessToken;
-        //     // The signed-in user info.
-        //     const user = result.user;
-
-        //     console.log(token, user)
-        //     // IdP data available using getAdditionalUserInfo(result)
-        //     // ...
-        // }).catch((error) => {
-        //     // Handle Errors here.
-        //     const errorCode = error.code;
-        //     const errorMessage = error.message;
-        //     // The email of the user's account used.
-        //     const email = error.customData.email;
-        //     // The AuthCredential type that was used.
-        //     const credential = GoogleAuthProvider.credentialFromError(error);
-
-        //     console.log(errorMessage)
-        //     // ...
-        // });
     }
+
 
     return (
     <div className='Form'><div className='wrap'>
@@ -166,56 +140,3 @@ function Login() {
 
 
 export default Login
-
-
-
-
-    // const LoginCheck = async () => {
-    //     const querySnapshot = await getDocs(query(collection(db, "User"), where("UserId","==",UserId),where("password","==",password)));
-
-    //     if (querySnapshot.docs.length === 1){
-    //         localStorage.setItem("Login", "yes");
-    //         localStorage.setItem("UserId", UserId);
-    //         window.location.pathname = "/";
-    //     }else{
-    //         alert("ユーザーIDかパスワードが間違っています。");
-    //     }
-    // }
-
-    // const RegistCheck = async () => {
-    //     const querySnapshot = await getDocs(query(collection(db, "User"), where("UserId","==",UserId)));
-
-    //     if (querySnapshot.docs.length === 0 && password === SecondPassword) {
-    //         await setDoc(doc(db, "User", UserId), {
-    //             "UserId" : UserId,
-    //             "password" : password
-    //         });
-    //         localStorage.setItem("Login", "yes");
-    //         localStorage.setItem("UserId", UserId);
-
-    //         let base = 0;
-    //         let goals = {
-    //             "筋肉量UP" : 30,
-    //             "ダイエット" : 20,
-    //             "健康維持" : 10
-    //         }
-    //         let frecency = {
-    //             "0" : 10,
-    //             "1" : 5,
-    //             "2" : 0
-    //         }
-    //         if (genderRef.current.value === "男"){
-    //             base += 10
-    //         }
-    //         base += goals[targetRef.current.value]
-    //         base += frecency[trainingRef.current.value]
-
-    //         localStorage.setItem("base", base)
-
-    //         window.location.pathname = "/"
-    //     }else if (password !== SecondPassword){
-    //         alert("パスワードが一致しません");
-    //     }else {
-    //         alert("そのユーザーIDは利用できません。別のものを登録してください。")
-    //     }
-    // }

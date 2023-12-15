@@ -142,6 +142,7 @@ class PoseDetection extends Component {
     const dy = this.trainingType === "LegTraining" ? 0 : 0
     const dWidth = this.trainingType === "LegTraining" ? cx : cx
     const dHeight = this.trainingType === "LegTraining" ? cy : cy;
+    const K = this.trainingType === "LegTraining" ? 0.1 : 0;
 
     /**calculateAngleWithin180 --------------------------------------------------------------------------
    * webカメラから得た座標情報を基に角度を計算する関数。
@@ -535,6 +536,18 @@ class PoseDetection extends Component {
 
         if (results.poseLandmarks === null || results.poseLandmarks === undefined) {
           return 0;
+        }
+
+        if (results.poseLandmarks) {
+          const landmarks = results.poseLandmarks;
+          var key;
+          for (key in POSE_LANDMARKS_LEFT) {
+              landmarks[POSE_LANDMARKS_LEFT[key]].x += K
+          }
+
+          for (key in POSE_LANDMARKS_RIGHT){
+              landmarks[POSE_LANDMARKS_RIGHT[key]].x -= K
+          }
         }
 
         // 座標データを基に筋トレできているかを判定 & カウント ----------------------------------------------

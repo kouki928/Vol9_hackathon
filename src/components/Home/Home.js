@@ -7,11 +7,15 @@ import dayjs from "dayjs";
 import { goalToNum, goal, gender, frequency } from '../utility/utilitys';
 import { Today } from '@mui/icons-material';
 import Swal from 'sweetalert2';
+import GlobalContext from '../../context/GlobalContext';
+import { useContext } from 'react';
 
 function Home(props) {
 
   const { userTrainingData, firstFlag, userId, personalData, weights} = props;
+  const { setUserTrainingData } = useContext(GlobalContext);
   const [ testFlag, setTestFlag ] = useState(firstFlag);
+  // const [  ]
   const genderRef = useRef(null);
   const trainingRef = useRef(null);
   const targetRef = useRef(null);
@@ -25,15 +29,13 @@ function Home(props) {
     if (!testFlag) {
       trainingData = userTrainingData;
     }
-  })
+  },[setUserTrainingData])
 
   const createMenu =  async(sendData, personalData) => {
 
-    console.log(sendData, personalData)
-
     const Today = dayjs(Date.now()).format("YYYY/MM/DD").toString();
-
     const url = "https://vol9-hackathon-predictionapi.onrender.com/target/"
+    
     fetch(url, {
       method : "POST",
       headers: {
@@ -63,7 +65,7 @@ function Home(props) {
         }
       }
 
-      setDoc(doc(collection(db, "TrainingData"), userId), {
+      const userTrainingData = {
         TrainingData : {
           [Today] : data
         },
@@ -71,12 +73,12 @@ function Home(props) {
         weights : {
           [Today] : weightRef.current.value
         }
+      }
+
+      setDoc(doc(collection(db, "TrainingData"), userId), userTrainingData).then(() => {
+        setUserTrainingData(userTrainingData)
+        window.location.reload()
       })
-
-      trainingData = { [Today] : data }
-
-    }).then(() => {
-      setTestFlag(false)
     })
 
   }
@@ -111,9 +113,6 @@ function Home(props) {
       frequency : trainingRef.current.value,
       goal   : targetRef.current.value
     }
-
-    console.log(personalData)
-
     const sendData = {
       Gender : gender[genderRef.current.value],
       Frequency : frequency[trainingRef.current.value],
@@ -131,14 +130,6 @@ function Home(props) {
       PWeeklyCompletion : 0,
       PPreviousDayTarget : 0,
     }
-
-    // trainingData = userTrainingData;
-    // console.log(trainingData)
-    // updateDoc(doc(collection(db, "TrainingData"), userId), {
-    //   personalData : personalData,
-    // })
-    // setTestFlag(false);
-
     await createMenu(sendData, personalData).catch((error) => {
       console.log(error)
     })
@@ -194,12 +185,8 @@ function Home(props) {
         })
         
       }
-    });
-
-    
+    });    
   }
-
-  console.log("OK?")
 
   return (
     // {firstFlag ? <InitSetting /> :<TrainingMenu userTrainingData={userTrainingData}/>}
