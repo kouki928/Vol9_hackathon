@@ -639,10 +639,13 @@ class PoseDetection extends Component {
     return (
       <div className='Main'>
         <div className='CameraWrapper'>
-          <img src={this.state.flag ? Up : Down} className='udImage'></img>
 
-          {this.state.clear ? 
-          <img src={CREAR} className='CImage'></img> : <></> }
+          {!this.state.clear ? 
+          <></> : <img src={this.state.flag ? Up : Down} className={this.trainingType === "LegTraining" ? "udLeg" : "udElse"}></img> }
+          
+
+          {!this.state.clear ? 
+          <img src={CREAR} className={this.trainingType === "LegTraining" ? "CLeg" : "CElse"}></img> : <></> }
           {/* <img src={Down} className='udImage'></img>
           <img src={Up} className='udImage'></img> */}
           <div className='batsu' onClick={

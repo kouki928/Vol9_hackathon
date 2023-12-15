@@ -1,0 +1,112 @@
+[debug] [2023-12-15T02:32:11.112Z] ----------------------------------------------------------------------
+[debug] [2023-12-15T02:32:11.114Z] Command:       C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2023-12-15T02:32:11.114Z] CLI Version:   13.0.1
+[debug] [2023-12-15T02:32:11.114Z] Platform:      win32
+[debug] [2023-12-15T02:32:11.115Z] Node Version:  v18.16.1
+[debug] [2023-12-15T02:32:11.115Z] Time:          Fri Dec 15 2023 11:32:11 GMT+0900 (GMT+09:00)
+[debug] [2023-12-15T02:32:11.115Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-15T02:32:11.176Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-15T02:32:11.176Z] > authorizing via signed-in user (koukifurukawa0625@gmail.com)
+[debug] [2023-12-15T02:32:11.177Z] [iam] checking project vol-9-hackathon for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-12-15T02:32:11.179Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions [none]
+[debug] [2023-12-15T02:32:11.179Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions x-goog-quota-user=projects/vol-9-hackathon
+[debug] [2023-12-15T02:32:11.179Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-12-15T02:32:12.618Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions 401
+[debug] [2023-12-15T02:32:12.618Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.cloudresourcemanager.v1.Projects.TestIamPermissions","service":"cloudresourcemanager.googleapis.com"}}]}}
+[debug] [2023-12-15T02:32:12.619Z] [iam] error while checking permissions, command may fail: FirebaseError: HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2023-12-15T02:32:12.620Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon [none]
+[debug] [2023-12-15T02:32:13.282Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon 401
+[debug] [2023-12-15T02:32:13.283Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2023-12-15T02:32:13.283Z] HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[error] 
+[error] Error: Assertion failed: resolving hosting target of a site with no site name or target name. This should have caused an error earlier
+[debug] [2023-12-15T02:32:41.379Z] ----------------------------------------------------------------------
+[debug] [2023-12-15T02:32:41.381Z] Command:       C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\firebase-tools\lib\bin\firebase.js init hosting:github
+[debug] [2023-12-15T02:32:41.382Z] CLI Version:   13.0.1
+[debug] [2023-12-15T02:32:41.382Z] Platform:      win32
+[debug] [2023-12-15T02:32:41.382Z] Node Version:  v18.16.1
+[debug] [2023-12-15T02:32:41.382Z] Time:          Fri Dec 15 2023 11:32:41 GMT+0900 (GMT+09:00)
+[debug] [2023-12-15T02:32:41.383Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-15T02:32:41.442Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-15T02:32:41.443Z] > authorizing via signed-in user (koukifurukawa0625@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\kouki\OneDrive - nkz.ac.jp\デスクトップ\Dev\hackathon\vol_9\test-project
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2023-12-15T02:32:44.752Z] Using project from CLI flag: vol-9-hackathon
+[debug] [2023-12-15T02:32:44.754Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon [none]
+[debug] [2023-12-15T02:32:45.082Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon 401
+[debug] [2023-12-15T02:32:45.083Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2023-12-15T02:32:45.083Z] HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2023-12-15T02:32:45.355Z] FirebaseError: HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+    at responseToError (C:\Users\kouki\AppData\Roaming\nvm\v18.16.1\node_modules\firebase-tools\lib\responseToError.js:49:12)
+    at RetryOperation._fn (C:\Users\kouki\AppData\Roaming\nvm\v18.16.1\node_modules\firebase-tools\lib\apiv2.js:292:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: Failed to get Firebase project vol-9-hackathon. Please make sure the project exists and your account has permission to access it.
+[debug] [2023-12-15T02:36:55.797Z] ----------------------------------------------------------------------
+[debug] [2023-12-15T02:36:55.798Z] Command:       C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2023-12-15T02:36:55.799Z] CLI Version:   13.0.1
+[debug] [2023-12-15T02:36:55.799Z] Platform:      win32
+[debug] [2023-12-15T02:36:55.799Z] Node Version:  v18.16.1
+[debug] [2023-12-15T02:36:55.800Z] Time:          Fri Dec 15 2023 11:36:55 GMT+0900 (GMT+09:00)
+[debug] [2023-12-15T02:36:55.800Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-15T02:36:55.857Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-15T02:36:55.858Z] > authorizing via signed-in user (koukifurukawa0625@gmail.com)
+[debug] [2023-12-15T02:36:55.858Z] [iam] checking project vol-9-hackathon for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-12-15T02:36:55.860Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions [none]
+[debug] [2023-12-15T02:36:55.860Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions x-goog-quota-user=projects/vol-9-hackathon
+[debug] [2023-12-15T02:36:55.860Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-12-15T02:36:57.393Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions 401
+[debug] [2023-12-15T02:36:57.394Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.cloudresourcemanager.v1.Projects.TestIamPermissions","service":"cloudresourcemanager.googleapis.com"}}]}}
+[debug] [2023-12-15T02:36:57.394Z] [iam] error while checking permissions, command may fail: FirebaseError: HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2023-12-15T02:36:57.395Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon [none]
+[debug] [2023-12-15T02:36:58.399Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon 401
+[debug] [2023-12-15T02:36:58.399Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2023-12-15T02:36:58.399Z] HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[error] 
+[error] Error: Assertion failed: resolving hosting target of a site with no site name or target name. This should have caused an error earlier
+[debug] [2023-12-15T02:40:29.358Z] ----------------------------------------------------------------------
+[debug] [2023-12-15T02:40:29.359Z] Command:       C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2023-12-15T02:40:29.360Z] CLI Version:   13.0.1
+[debug] [2023-12-15T02:40:29.360Z] Platform:      win32
+[debug] [2023-12-15T02:40:29.360Z] Node Version:  v18.16.1
+[debug] [2023-12-15T02:40:29.370Z] Time:          Fri Dec 15 2023 11:40:29 GMT+0900 (GMT+09:00)
+[debug] [2023-12-15T02:40:29.370Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-15T02:40:29.472Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-15T02:40:29.472Z] > authorizing via signed-in user (koukifurukawa0625@gmail.com)
+[debug] [2023-12-15T02:40:29.473Z] [iam] checking project vol-9-hackathon for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2023-12-15T02:40:29.474Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions [none]
+[debug] [2023-12-15T02:40:29.474Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions x-goog-quota-user=projects/vol-9-hackathon
+[debug] [2023-12-15T02:40:29.474Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2023-12-15T02:40:30.963Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions 401
+[debug] [2023-12-15T02:40:30.963Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/vol-9-hackathon:testIamPermissions {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.cloudresourcemanager.v1.Projects.TestIamPermissions","service":"cloudresourcemanager.googleapis.com"}}]}}
+[debug] [2023-12-15T02:40:30.964Z] [iam] error while checking permissions, command may fail: FirebaseError: HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2023-12-15T02:40:30.965Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon [none]
+[debug] [2023-12-15T02:40:32.284Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon 401
+[debug] [2023-12-15T02:40:32.285Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/vol-9-hackathon {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2023-12-15T02:40:32.285Z] HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[error] 
+[error] Error: Assertion failed: resolving hosting target of a site with no site name or target name. This should have caused an error earlier

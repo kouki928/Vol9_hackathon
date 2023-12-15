@@ -39,7 +39,7 @@ function HamburgerMenu(props) {
         </div>
         <div className='headerIcon'>{PageData["icon"]}</div>
         <div className='headerTitle'>{PageData["title"]}</div>
-        <div className='headerLogout' onClick={logOut}>ログアウト</div>
+        {/* <div className='headerLogout' onClick={logOut}>ログアウト</div> */}
     </div>
     <div className='Subbar' id={active ? "active" : ""}>
         <div className='overlay' onClick={classToggle}>

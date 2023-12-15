@@ -140,7 +140,7 @@ function Login() {
             <div onClick={googleSignIn}><img src={SignInWithGoogle} alt='Google' className='googleImage'></img></div>
             <div className='GuideButton'>
             <div onClick={signIn} className='LoginButton'>ログイン</div>
-            <div onClick={classToggle} className='LRToggle'>ユーザー登録はこちら</div></div>
+            <div onClick={classToggle} className='LRToggle'>新規登録はこちら</div></div>
         </div>
         
         {/* ユーザー登録用フォーム追加 */}
@@ -156,7 +156,7 @@ function Login() {
 
 
             <div className='GuideButton'>
-                <div className='LoginButton' onClick={signUp}> ユーザー登録</div>
+                <div className='LoginButton' onClick={signUp}> 新規登録</div>
                 <div onClick={classToggle} className='LRToggle'>ログインはこちら</div>
             </div>
         </div>
