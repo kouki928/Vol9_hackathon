@@ -333,12 +333,12 @@ class PoseDetection extends Component {
           this.angle = sum / this.frameCount;
           this.angle = Math.round(this.angle);
           // 判定
-          if (this.state.flag === false && this.angle > 130 && average_score > 0.6) {
+          if (this.state.flag === false && this.angle < 130 && average_score > 0.6) {
             this.setState({
               flag : true
             })
             this.stopTimeCount = 0;
-          } else if (this.state.flag === true && this.angle < 60 && average_score > 0.6) {
+          } else if (this.state.flag === true && this.angle > 60 && average_score > 0.6) {
             if (this.beforCount !== this.state.count) {
               fadeOutText(Date.now());
               this.beforCount = this.state.count;
@@ -653,11 +653,11 @@ class PoseDetection extends Component {
       <div className='Main'>
         <div className='CameraWrapper'>
 
-          {!this.state.clear ? 
-          <></> : <img src={this.state.flag ? Up : Down} className={this.trainingType === "LegTraining" ? "udLeg" : "udElse"}></img> }
+          {this.state.clear ? 
+          <></> : <img src={this.state.flag ? Down : Up} className={this.trainingType === "LegTraining" ? "udLeg" : "udElse"}></img> }
           
 
-          {!this.state.clear ? 
+          {this.state.clear ? 
           <img src={CREAR} className={this.trainingType === "LegTraining" ? "CLeg" : "CElse"}></img> : <></> }
           {/* <img src={Down} className='udImage'></img>
           <img src={Up} className='udImage'></img> */}

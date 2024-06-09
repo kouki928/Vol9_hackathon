@@ -153,7 +153,7 @@ function Home(props) {
 
         const ip = "192.168.0.9"
         // const url = `http://${ip}:8000/`
-        const url = "https://2bd4-240b-c020-4c2-bb06-2927-b74-2999-6ee3.ngrok-free.app/"
+        const url = "https://ce64-240b-c010-4b1-69b1-5381-1070-b709-9c25.ngrok-free.app/"
 
         fetch(url, {
             method : "GET",

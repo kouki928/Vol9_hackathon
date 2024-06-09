@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
-import ja from "dayjs/locale/ja";
+
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import GlobalContext from "../../context/GlobalContext";
 import dayjs from "dayjs";
+import ja from "dayjs/locale/ja";
 
 dayjs.locale(ja);
 
